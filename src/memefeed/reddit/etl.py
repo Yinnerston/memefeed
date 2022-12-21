@@ -1,5 +1,5 @@
 import praw
-import pmaw
+# import pmaw
 from csv import reader
 from re import match
 import sentry_sdk
@@ -20,7 +20,7 @@ class RedditETL:
         # Comment this out if you need
         self.reddit.read_only = True
         # TODO: Potentially used to backfill data (?)
-        self.pushshift = pmaw.PushshiftAPI(praw=self.reddit)
+        # self.pushshift = pmaw.PushshiftAPI(praw=self.reddit)
         # Sentry monitoring:
         # TODO: Isn't this already handled by django app?
         sentry_sdk.init(
@@ -32,40 +32,66 @@ class RedditETL:
             traces_sample_rate=1.0
         )
 
-
-
     def extract(self):
+        """
+        Extracts the top N_POSTS_PER_SUBREDDIT from each subreddit in SUBREDDITS_CSV
+        """
+        posts = []
         with open(RedditETL.SUBREDDITS_CSV, newline='') as subreddits_csv:
             subreddit_reader = reader(subreddits_csv)
             for row in subreddit_reader:
                 # Prune invalid strings / validate strings
                 valid_subreddits_in_row = [sr for sr in row if match("^[A-Za-z0-9_]{3,21}$", sr)]
                 # Iterate over subreddits
+                
                 for subreddit in valid_subreddits_in_row:
-                    posts = []
-                    error_msg = ''
+                    top_posts = []
                     try:
                         # Get top N posts daily from each subreddit in the list
-                        posts = self.reddit.subreddit(subreddit).top(time_filter="day", limit=RedditETL.N_POSTS_PER_SUBREDDIT)
-                    except praw.errors.HTTPException as err:
+                        top_posts = self.reddit.subreddit(subreddit).top(time_filter="day", limit=RedditETL.N_POSTS_PER_SUBREDDIT)
+                    except praw.exceptions.PRAWException as err:
                         # On error, report to Sentry
                         sentry_sdk.capture_exception(err)
                     else:
-                        for post in posts:  
-                            print(post.title, post.score, post.author, post.id, post.url, post.selftext, post.media)
-                            
+                        # TODO: Join subreddit --> Subreddit model
+                        # TODO: Join author --> author model
+                        # TODO: Batch load to postgres
+                        posts.append((subreddit, top_posts))
+        return posts
 
 
+    def transform(self, posts_tuples):
+        """
+        Transforms data in the form [(subreddit: string, top_posts: [..]), ..] to format stored in db
+        """
+        # TODO: Cache subreddit table (?) so you can map subreddit name to foreign key
+        # TODO: Determine encoding format for media and each attribute?
+        for subreddit, posts in posts_tuples:
+            for post in posts:
+                # TODO: Which fields to store?
+                # Media fields --> media, video_only, media_only, etc.. ?
+                # Id fields --> id, url, 
+                print(post.title, post.score, post.author, subreddit, post.id, post.url, post.selftext, post.media, post.flair, post.thumbnail)
 
-    def transform(self):
-        pass
 
     def load(self):
+        """
+        Batch load into postgres and join with related data models
+        """
         pass
 
+    def run_pipeline(self):
+        """
+        Run ETL pipeline.
+        """
+        res = self.extract()
+        res = self.transform(res)
+        res = self.load(res)
 
 
-RedditETL().extract()
+
+
+RedditETL().run_pipeline()
 # Considerations:
 # Failure recovery --> Responses are cached, should I retry until finished?
 # What about rate limits?
