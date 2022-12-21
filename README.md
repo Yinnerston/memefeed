@@ -25,3 +25,4 @@ A more comprehensive summary will be updated on https://docs.google.com/document
 - Security: SQL injection attack, SSL / HTTPS, XSS protection
 - Jinja2 templating
 - Backend monitoring and observability using Solarwind + Django admin panel 
+- Configure Apache production server for deployment
