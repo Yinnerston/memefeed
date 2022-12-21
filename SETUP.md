@@ -29,3 +29,4 @@ password=YOUR_PASSWORD
 username=YOUR_USERNAME
 user_agent=Alpine:memefeed:v1.0.0 (by u/YOUR_USERNAME)
 ```
+- Change the list of subreddits if you want in `src\memefeed\reddit\data\subreddits.csv`
