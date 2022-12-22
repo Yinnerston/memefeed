@@ -18,7 +18,7 @@ class RedditETL:
     CACHE_DIR = "./cache"
     SUBREDDITS_CSV = "data/subreddits.csv"
     # TODO: Remove in production alongside usage in extract()
-    N_POSTS_PER_SUBREDDIT = 5
+    N_POSTS_PER_SUBREDDIT = 50
 
     def __init__(self):
         # Auth information is contained in praw.ini file. See setup.md
@@ -66,13 +66,19 @@ class RedditETL:
                         # TODO: Join author --> author model
                         # TODO: Batch load to postgres
                         posts += top_posts
-                    break
 
         return posts
 
     def transform(self, posts):
         """
         Transforms data in the form [(subreddit: string, top_posts: [..]), ..] to format stored in db
+
+        Functional dependencies:
+        id -> title, author, score, url, domain, subreddit, over_18, is_self, is_video
+        id -> shortlink (https://redd.it/{id})
+        is_self -> selftext, is_self -> selftext_html
+        is_video -> media, is_video -> media_embed, is_video -> secure_media, is_video -> thumbnail, is_video -? secure_media_embed
+        subreddit -> subreddit_id (or other way around?)
         """
         # TODO: Cache subreddit table (?) so you can map subreddit name to foreign key
         # TODO: Determine encoding format for media and each attribute?
@@ -81,18 +87,15 @@ class RedditETL:
             # Media fields --> media, video_only, media_only, etc.. ?
             # Id fields --> id, url,
             print(
+                "id " + str(post.id),
                 "title " + str(post.title),
                 "author " + str(post.author),
-                "id " + str(post.id),
                 "score " + str(post.score),
-                "url " + str(post.url),
+                "url " + str(post.url), # Otherwise a link to a url?
                 "domain " + str(post.domain),
                 "subreddit " + str(post.subreddit),
-                "subreddit_id " + str(post.subreddit_id),
+                # "subreddit_id " + str(post.subreddit_id),
                 "created_utc " + str(post.created_utc),
-                "category " + str(post.category),
-                "content_categories " + str(post.content_categories),
-                "discussion_type " + str(post.discussion_type),
                 "is_self " + str(post.is_self),  # if True, only text
                 "is_video " + str(post.is_video),  # If True, then video in media
                 "media " + str(post.media),
@@ -118,6 +121,7 @@ class RedditETL:
         """
         Run ETL pipeline.
         """
+
         res = self.extract()
         res = self.transform(res)
         res = self.load(res)
