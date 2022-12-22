@@ -50,7 +50,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "reddit.apps.RedditConfig"
+    "reddit.apps.RedditConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
