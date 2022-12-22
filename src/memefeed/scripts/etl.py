@@ -4,7 +4,6 @@ from csv import reader
 from re import match
 import sentry_sdk
 
-
 class RedditETL:
     """
     Class that ingests data from reddit and puts it into the postgres db.
