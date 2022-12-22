@@ -5,6 +5,10 @@ from csv import reader
 from re import match
 import sentry_sdk
 
+# TODO: Define reddit submission model in reddit/models.py
+# bulk_create() to load into model
+# Figure out how to do the foreign key3
+
 
 class RedditETL:
     """
@@ -61,38 +65,54 @@ class RedditETL:
                         # TODO: Join subreddit --> Subreddit model
                         # TODO: Join author --> author model
                         # TODO: Batch load to postgres
-                        posts.append((subreddit, top_posts))
+                        posts += top_posts
+                    break
+
         return posts
 
-    def transform(self, posts_tuples):
+    def transform(self, posts):
         """
         Transforms data in the form [(subreddit: string, top_posts: [..]), ..] to format stored in db
         """
         # TODO: Cache subreddit table (?) so you can map subreddit name to foreign key
         # TODO: Determine encoding format for media and each attribute?
-        for subreddit, posts in posts_tuples:
-            for post in posts:
-                # TODO: Which fields to store?
-                # Media fields --> media, video_only, media_only, etc.. ?
-                # Id fields --> id, url,
-                print(
-                    post.title,
-                    post.score,
-                    post.author,
-                    subreddit,
-                    post.id,
-                    post.url,
-                    post.selftext,
-                    post.media,
-                    post.flair,
-                    post.thumbnail,
-                )
+        for post in posts:
+            # TODO: Which fields to store?
+            # Media fields --> media, video_only, media_only, etc.. ?
+            # Id fields --> id, url,
+            print(
+                "title " + str(post.title),
+                "author " + str(post.author),
+                "id " + str(post.id),
+                "score " + str(post.score),
+                "url " + str(post.url),
+                "domain " + str(post.domain),
+                "subreddit " + str(post.subreddit),
+                "subreddit_id " + str(post.subreddit_id),
+                "created_utc " + str(post.created_utc),
+                "category " + str(post.category),
+                "content_categories " + str(post.content_categories),
+                "discussion_type " + str(post.discussion_type),
+                "is_self " + str(post.is_self),  # if True, only text
+                "is_video " + str(post.is_video),  # If True, then video in media
+                "media " + str(post.media),
+                "media_embed " + str(post.media_embed),
+                "media_only " + str(post.media_only),
+                "selftext " + str(post.selftext),
+                "selftext_html " + str(post.selftext_html),
+                "over_18 " + str(post.over_18),  # if True, thumbnail is nsfw
+                "thumbnail " + str(post.thumbnail),  # Either jpg url, nsfw or none
+                "secure_media " + str(post.secure_media),
+                "secure_media_embed " + str(post.secure_media_embed),
+                sep="\n",
+            )
+            print("---")
 
-    def load(self):
+    def load(self, res):
         """
         Batch load into postgres and join with related data models
         """
-        pass
+        return res
 
     def run_pipeline(self):
         """

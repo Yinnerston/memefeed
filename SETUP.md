@@ -20,7 +20,7 @@ in another terminal.
 - Run initial migration `docker-compose exec web python manage.py migrate --noinput`
 - Check default Django tables were created `docker-compose exec db psql --username=memefeeduser --dbname=memefeed`
 - Create a reddit app
-- Add praw.ini file with format from reddit app
+- Add praw.ini file to `src\memefeed\scripts`
 ```ini
 [memefeedbot]
 client_id=CLIENT_ID
@@ -30,3 +30,4 @@ username=YOUR_USERNAME
 user_agent=Alpine:memefeed:v1.0.0 (by u/YOUR_USERNAME)
 ```
 - Change the list of subreddits if you want in `src\memefeed\reddit\data\subreddits.csv`
+- Use black python code formatter

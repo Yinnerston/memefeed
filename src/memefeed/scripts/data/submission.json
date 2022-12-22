@@ -1,0 +1,29 @@
+{
+    "submission": [
+        "title",
+        "author",
+        "score",
+        "url",
+        "subreddit",
+        "subreddit_id",
+        "created_utc",
+
+        "category",
+        "content_categories",
+
+        "discussion_type",
+        "domain",
+        "id",
+        "is_self",
+        "is_video",
+        "media",
+        "media_embed",
+        "media_only",
+        "selftext",
+        "selftext_html",
+        "over_18",
+        "thumbnail",
+        "secure_media",
+        "secure_media_embed"
+    ]
+}
