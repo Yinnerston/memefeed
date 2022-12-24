@@ -28,8 +28,9 @@ class Submission(models.Model):
     created_utc = models.DateTimeField("Date the submission was created")
     # Submission Content / Media
     # TODO: Normalize media
-    is_self = models.BooleanField()
-    is_video = models.BooleanField()
+    is_self = models.BooleanField(default=False)
+    is_video = models.BooleanField(default=False)
+    media_only = models.BooleanField(default=False)
     media = models.JSONField(default=None, blank=True, null=True)
     media_embed = models.JSONField(default=None, blank=True, null=True)
     selftext = models.TextField(max_length=40000, default=None, blank=True, null=True)
