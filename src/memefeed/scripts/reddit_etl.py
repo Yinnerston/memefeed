@@ -139,34 +139,43 @@ class RedditETL:
             traces_sample_rate=1.0,
         )
 
-    def __dict_map(self, post, model_name, model):
+    def __dict_map(self, post):
         """
         Build dictionary that applies map_func to each value.
         """
-        # Convert post to the corresponding dict
-        output_model = {}
-        for k, v in model.items():
-            map_func, attr_val = v
-            if map_func is not None:
-                output_model[k] = map_func(post, attr_val)
-            else:
-                output_model[k] = attr_val
-        # TODO: Do i need to save() author, subreddit before submission?
-        # To avoid race condition?
-        created_model = {}
-        if model_name == "AUTHOR":
-            output_model["name"] = output_model["name"].name
-            created_model = Author(**output_model)
-        elif model_name == "SUBREDDIT":
-            output_model["name"] = output_model["name"].display_name
-            created_model = Subreddit(**output_model)
-        elif model_name == "SUBMISSION":
-            # TODO: Does this create duplicates (?)
-            output_model["subreddit"] = Subreddit(name=output_model["subreddit"], favourite=False)
-            output_model["author"] = Author(name=output_model["author"], favourite=False)
-            created_model = Submission(**output_model)
+        foreign_key_dependencies = {}
+        for model_name, model in RedditETL.MODEL_MAPPINGS.items():
+            # Convert post to the corresponding dict
+            output_model = {}
+            for k, v in model.items():
+                map_func, attr_val = v
+                if map_func is not None:
+                    output_model[k] = map_func(post, attr_val)
+                else:
+                    output_model[k] = attr_val
+            # TODO: Do i need to save() author, subreddit before submission?
+            # To avoid race condition?
+            created_model = {}
+            if model_name == "AUTHOR":
+                output_model["name"] = output_model["name"].name
+                created_model = Author(**output_model)
+                foreign_key_dependencies["author"] = {
+                    "submission": created_model
+                }
+            elif model_name == "SUBREDDIT":
+                output_model["name"] = output_model["name"].display_name
+                created_model = Subreddit(**output_model)
+                foreign_key_dependencies["subreddit"] = {
+                    "submission": created_model
+                }
+            elif model_name == "SUBMISSION":
+                # TODO: Does this create duplicates (?)
+                output_model["subreddit"] = foreign_key_dependencies["subreddit"]["submission"]
+                output_model["author"] = foreign_key_dependencies["author"]["submission"]
+                created_model = Submission(**output_model)
+            # Save models so they can be accessed by foreign key
+            created_model.save()
         return created_model
-        
 
     def __transform_top_posts(self, top_posts):
         """
@@ -174,10 +183,7 @@ class RedditETL:
          for model processing.
         """
         transformed_posts = [
-            [
-                self.__dict_map(post, model_name, model) 
-                for model_name, model in RedditETL.MODEL_MAPPINGS.items()
-            ]
+            self.__dict_map(post)
             for post in top_posts
         ]
         return transformed_posts
