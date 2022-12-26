@@ -139,7 +139,7 @@ class RedditETL:
             traces_sample_rate=1.0,
         )
 
-    def __dict_map(self, post):
+    def __load_post(self, post):
         """
         Build dictionary that applies map_func to each value.
         """
@@ -183,12 +183,12 @@ class RedditETL:
          for model processing.
         """
         transformed_posts = [
-            self.__dict_map(post)
+            self.__load_post(post)
             for post in top_posts
         ]
         return transformed_posts
 
-        # filtered_attributes_list = [(self.__dict_map(post, model) for model_name, model in RedditETL.MODEL_MAPPINGS.items()) for post in top_posts]
+        # filtered_attributes_list = [(self.__load_post(post, model) for model_name, model in RedditETL.MODEL_MAPPINGS.items()) for post in top_posts]
         # Return transposed filtered_attributes_list
         # return list(map(list, zip_longest(*filtered_attributes_list, fillvalue=None)))
 
@@ -242,6 +242,7 @@ class RedditETL:
         """
         Batch load into postgres and join with related data models
         """
+        # TODO: Change this func as bulk_create doesn't work with models using foreign keys
         # Posts is a list [ [Authors..], [Subreddits..], [Submissions..]]
         authors, subreddits, submissions = posts
         Author.objects.bulk_create(authors)
