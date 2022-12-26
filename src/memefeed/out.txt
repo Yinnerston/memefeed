@@ -1,0 +1,14 @@
+Found 1 test(s).
+System check identified no issues (0 silenced).
+dict_items([('AUTHOR', {'name': (<function author_getattr at 0x7f24d834d6c0>, 'author')}), ('SUBREDDIT', {'name': (<function subreddit_getattr at 0x7f24d7fa9ea0>, 'subreddit')}), ('SUBMISSION', {'title': (<built-in function getattr>, 'title'), 'score': (<built-in function getattr>, 'score'), 'url': (<built-in function getattr>, 'url'), 'created_utc': (<function unix_timestamp_getattr at 0x7f24d7fb71c0>, 'created_utc'), 'domain': (<built-in function getattr>, 'domain'), 'id': (<built-in function getattr>, 'id'), 'is_self': (<built-in function getattr>, 'is_self'), 'is_video': (<built-in function getattr>, 'is_video'), 'media_only': (<built-in function getattr>, 'media_only'), 'media': (<function filter_null_getattr_list at 0x7f24d7fb7250>, 'media'), 'media_embed': (<function filter_null_getattr_list at 0x7f24d7fb7250>, 'media_embed'), 'selftext': (<function filter_null_getattr_str at 0x7f24d7fb72e0>, 'selftext'), 'selftext_html': (<function filter_null_getattr_str at 0x7f24d7fb72e0>, 'selftext_html'), 'nsfw': (<built-in function getattr>, 'over_18'), 'thumbnail': (<built-in function getattr>, 'thumbnail'), 'secure_media': (<function filter_null_getattr_list at 0x7f24d7fb7250>, 'secure_media'), 'secure_media_embed': (<function filter_null_getattr_list at 0x7f24d7fb7250>, 'secure_media_embed'), 'author': (<function author_getattr at 0x7f24d834d6c0>, 'author'), 'subreddit': (<function subreddit_getattr at 0x7f24d7fa9ea0>, 'subreddit')})])
+MAKING AUTHOR
+{'name': 'TheDeepBlueZ'}
+<QuerySet []>
+MAKING SUBREDDIT
+{'name': 'funny'}
+<QuerySet []>
+MAKING SUBMISSIOn
+{'title': 'Another Christmas as the last unmarried in my family', 'score': 90271, 'url': 'https://i.redd.it/5v71lfqpk68a1.jpg', 'created_utc': datetime.datetime(2022, 12, 26, 0, 46, 4, tzinfo=<UTC>), 'domain': 'i.redd.it', 'id': 'zvb06r', 'is_self': False, 'is_video': False, 'media_only': False, 'media': {}, 'media_embed': {}, 'selftext': '', 'selftext_html': '', 'nsfw': False, 'thumbnail': 'https://b.thumbs.redditmedia.com/xkvY_CApJp4vsPbbsUXP9u2uJdNTlMBL3_cSgp1ZB2I.jpg', 'secure_media': {}, 'secure_media_embed': {}, 'author': 'TheDeepBlueZ', 'subreddit': 'funny'}
+<QuerySet []>
+FINISHED
+<QuerySet [<Author: TheDeepBlueZ>]>

@@ -178,15 +178,17 @@ class RedditETLTest(TestCase):
         pass
 
 
-    def test_load_submission_invalid_map_func_plus_recovery(self):
+    def test_load_submission_invalid_map_func_atomic_commit(self):
         """
         Test that loading invalid models doesn't work.
         Test that the one atempted invalid insertion doesn't break the functionality.
+        Test atomic commit
         """
         # Define some invalid function
-        class InvalidObject(object):
+        class InvalidSubmission(praw.models.Submission):
             def __init__(self, invalid_attr) -> None:
                 self.invalid_attr = invalid_attr
+                self.title = "invalid"
 
             def __getattribute__(self, __name: str):
                 raise Exception("Always raises exception")
@@ -194,12 +196,15 @@ class RedditETLTest(TestCase):
             def __str__(self) -> str:
                 return self.invalid_attr
 
-        invalid_obj = InvalidObject("invalid_attr")
+        
         post = self.get_example_submission()
-        post.title = invalid_obj
         
         # Expected behaviour is 
-        self.instance._load_submission(post)
+        invalid_obj = InvalidSubmission("invalid_attr")
+        try:
+            self.instance._load_submission(invalid_obj)
+        except Exception:
+            pass
         # Check that invalid model hasn't been loaded
         # Author, Subreddit, Submission should be added in one transaction
         self.assertEquals(Author.objects.count(), 0)
@@ -210,8 +215,6 @@ class RedditETLTest(TestCase):
         self.assertEquals(Author.objects.count(), 1)
         self.assertEquals(Subreddit.objects.count(), 1)
         self.assertEquals(Subreddit.objects.count(), 1)
-        # Restore the AUTHOR_MAP back to the original format
-        self.instance.AUTHOR_MAP.pop("invalid")
 
     def test_transform_top_submissions_valid_input(self):
         """
@@ -224,3 +227,5 @@ class RedditETLTest(TestCase):
         self.assertEquals(Author.objects.count(), 1)
         self.assertEquals(Subreddit.objects.count(), 1)
         self.assertEquals(Subreddit.objects.count(), 1)
+
+# TODO: More tests checking atomic commits

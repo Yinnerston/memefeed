@@ -12,7 +12,7 @@ import sentry_sdk
 
 from scripts.etl_utils import *
 from reddit.models import Author, Subreddit, Submission
-from django.db import models
+from django.db import models, DatabaseError, transaction
 
 from itertools import zip_longest
 
@@ -116,14 +116,14 @@ class RedditETL:
         "is_self": (getattr, "is_self"),
         "is_video": (getattr, "is_video"),
         "media_only": (getattr, "media_only"),
-        "media": (filter_null_getattr, "media"),
-        "media_embed": (filter_null_getattr, "media_embed"),
-        "selftext": (getattr, "selftext"),
-        "selftext_html": (getattr, "selftext_html"),
+        "media": (filter_null_getattr_list, "media"),
+        "media_embed": (filter_null_getattr_list, "media_embed"),
+        "selftext": (filter_null_getattr_str, "selftext"),
+        "selftext_html": (filter_null_getattr_str, "selftext_html"),
         "nsfw": (getattr, "over_18"),
         "thumbnail": (getattr, "thumbnail"),
-        "secure_media": (filter_null_getattr, "secure_media"),
-        "secure_media_embed": (filter_null_getattr, "secure_media_embed"),
+        "secure_media": (filter_null_getattr_list, "secure_media"),
+        "secure_media_embed": (filter_null_getattr_list, "secure_media_embed"),
         # Foreign keys
         "author": (author_getattr, "author"),
         "subreddit": (subreddit_getattr, "subreddit"),
@@ -173,39 +173,44 @@ class RedditETL:
         foreign_key_dependencies = {}
         obj = None
         created = None
-        for model_name, model in RedditETL.MODEL_MAPPINGS.items():
-            # Convert submission to the corresponding dict for django model **kwargs
-            output_model = {}
-            for k, v in model.items():
-                map_func, attr_val = v
-                if map_func is not None:
-                    output_model[k] = map_func(submission, attr_val)
-                else:
-                    output_model[k] = attr_val
-            # To avoid race condition? TODO: Do i need to save() author, subreddit before submission?
-            # Convert Dict to django model
-            if model_name == "AUTHOR":
-                obj, created = Author.objects.get_or_create(**output_model)
-                foreign_key_dependencies["author"] = {
-                    "submission": obj  # Primary key of Author used by Submission
-                }
-            elif model_name == "SUBREDDIT":
-                obj, created = Subreddit.objects.get_or_create(**output_model)
-                foreign_key_dependencies["subreddit"] = {
-                    "submission": obj  # Primary key of Subreddit used by Submission
-                }
-            elif model_name == "SUBMISSION":
-                # TODO: Does this create duplicates (?)
-                output_model["subreddit"] = foreign_key_dependencies["subreddit"][
-                    "submission"
-                ]
-                output_model["author"] = foreign_key_dependencies["author"][
-                    "submission"
-                ]
-                obj, created = Submission.objects.get_or_create(**output_model)
-            # Save models so they can be accessed by foreign key
-            if created:
-                obj.save()
+        try:
+            with transaction.atomic():
+                for model_name, model in RedditETL.MODEL_MAPPINGS.items():                
+                        # Convert submission to the corresponding dict for django model **kwargs
+                        output_model = {}
+                        for k, v in model.items():
+                            map_func, attr_val = v
+                            if map_func is not None:
+                                output_model[k] = map_func(submission, attr_val)
+                            else:
+                                output_model[k] = attr_val
+                        # To avoid race condition? TODO: Do i need to save() author, subreddit before submission?
+                        # Convert Dict to django model
+                        if model_name == "AUTHOR":
+                            obj, created = Author.objects.get_or_create(**output_model)
+                            foreign_key_dependencies["author"] = {
+                                "submission": obj,  # Primary key of Author used by Submission
+                            }
+                        elif model_name == "SUBREDDIT":
+                            obj, created = Subreddit.objects.get_or_create(**output_model)
+                            foreign_key_dependencies["subreddit"] = {
+                                "submission": obj,  # Primary key of Subreddit used by Submission
+                            }
+                        elif model_name == "SUBMISSION":
+                            output_model["subreddit"] = foreign_key_dependencies["subreddit"][
+                                "submission"
+                            ]
+                            output_model["author"] = foreign_key_dependencies["author"][
+                                "submission"
+                            ]
+                            # TODO: Don't save until you've done all validations
+                            obj, created = Submission.objects.get_or_create(**output_model)
+                        
+        except DatabaseError as e:
+            # Expected behaviour for a invalid post is to report , ignore it and add subsequent posts
+            sentry_sdk.capture_exception(e)
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
         return obj
 
     def _transform_top_submissions(self, top_submissions):
@@ -216,9 +221,6 @@ class RedditETL:
         transformed_submissions = [
             self._load_submission(submission) for submission in top_submissions
         ]
-        # DEBUG:
-        for i in transformed_submissions:
-            print(i)
         return transformed_submissions
 
         # filtered_attributes_list = [(self._load_submission(submission, model) for model_name, model in RedditETL.MODEL_MAPPINGS.items()) for submission in top_submissions]

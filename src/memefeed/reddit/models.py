@@ -40,8 +40,8 @@ class Submission(models.Model):
     media_only = models.BooleanField(default=False)
     media = models.JSONField(default=dict, blank=True)
     media_embed = models.JSONField(default=dict)
-    selftext = models.TextField(max_length=40000)
-    selftext_html = models.TextField()  # TODO: Should this be binary?
+    selftext = models.TextField(max_length=40000, default=str)
+    selftext_html = models.TextField(default=str)  # TODO: Should this be binary?
     nsfw = models.BooleanField(default=False)
     thumbnail = models.URLField("Thumbnail URL")
     secure_media = models.JSONField(default=dict)
