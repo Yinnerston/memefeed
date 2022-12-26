@@ -154,7 +154,8 @@ class RedditETL:
             + str(submission))
             return {}
         foreign_key_dependencies = {}
-        created_model = {}
+        obj = None
+        created = None
         for model_name, model in RedditETL.MODEL_MAPPINGS.items():
             # Convert submission to the corresponding dict for django model **kwargs
             output_model = {}
@@ -168,23 +169,24 @@ class RedditETL:
             # Convert Dict to django model
             if model_name == "AUTHOR":
                 output_model["name"] = output_model["name"].name
-                created_model = Author(**output_model)
+                obj, created = Author.objects.get_or_create(**output_model)
                 foreign_key_dependencies["author"] = {
-                    "submission": created_model
+                    "submission": obj
                 }
             elif model_name == "SUBREDDIT":
                 output_model["name"] = output_model["name"].display_name
-                created_model = Subreddit(**output_model)
+                obj, created = Subreddit.objects.get_or_create(**output_model)
                 foreign_key_dependencies["subreddit"] = {
-                    "submission": created_model
+                    "submission": obj
                 }
             elif model_name == "SUBMISSION":
                 # TODO: Does this create duplicates (?)
                 output_model["subreddit"] = foreign_key_dependencies["subreddit"]["submission"]
                 output_model["author"] = foreign_key_dependencies["author"]["submission"]
-                created_model = Submission(**output_model)
+                obj, created = Submission.objects.get_or_create(**output_model)
             # Save models so they can be accessed by foreign key
-            created_model.save()
+            if created:
+                obj.save()
         return created_model
 
     def __transform_top_submissions(self, top_submissions):
