@@ -91,12 +91,12 @@ class RedditETLTest(TestCase):
         # Load submission into db
         loaded_submission = self.instance._load_submission(submission)
         self.assertEquals(loaded_submission, {})
-        # Check that Author is in database
-        self.assertFalse(Author.objects.get(name=submission.author).exists())
-        # Check that Subreddit is in database
-        self.assertFalse(Subreddit.objects.get(name=submission.subreddit).exists())
-        # Check that submission is in database
-        self.assertFalse(Submission.objects.get(id=submission.id).exists())
+        # Check that Author is not in database
+        self.assertEquals(Author.objects.count(), 0)
+        # Check that Subreddit is not in database
+        self.assertEquals(Subreddit.objects.count(), 0)
+        # Check that submission is not in database
+        self.assertEquals(Submission.objects.count(), 0)
 
     def test_load_submission_same_author_different_subreddits(self):
         """
