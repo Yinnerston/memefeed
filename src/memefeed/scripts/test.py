@@ -9,7 +9,6 @@ import httpretty
 import praw
 import sentry_sdk
 
-
 class RedditETLTest(TestCase):
     """
     Testing ETL process
@@ -17,11 +16,13 @@ class RedditETLTest(TestCase):
 
     def setUp(self):
         """
-        Called automatically on startup by django test framework
+        Called automatically on startup by django test framework.
         """
+        # Note: This persists across tests
         self.instance = RedditETL()
         # Disable sending error messages to sentry whilst testing
         sentry_sdk.init(dsn="")
+        
 
     def get_example_submission(self):
         """
@@ -112,17 +113,17 @@ class RedditETLTest(TestCase):
             duplicate_author_submission
         )
         # Check that there's only one author saved
-        self.assertTrue(Author.objects.get(name=submission.author).exists())
+        self.assertTrue(Author.objects.get(name=submission.author))
         self.assertEquals(Author.objects.count(), 1)
         # Check that there are two subreddits saved
-        self.assertTrue(Subreddit.objects.get(name=submission.subreddit).exists())
+        self.assertTrue(Subreddit.objects.get(name=submission.subreddit))
         self.assertTrue(
-            Subreddit.objects.get(name=duplicate_author_submission.subreddit).exists()
+            Subreddit.objects.get(name=duplicate_author_submission.subreddit)
         )
         self.assertEquals(Subreddit.objects.count(), 2)
         # Check that there are two submissions saved
-        self.assertTrue(Submission.objects.get(id=submission.id).exists())
-        self.assertTrue(Submission.objects.get(id=duplicate_author_submission.id).exists())
+        self.assertTrue(Submission.objects.get(id=submission.id))
+        self.assertTrue(Submission.objects.get(id=duplicate_author_submission.id))
         self.assertEquals(Submission.objects.count(), 2)
 
     def test_load_submission_different_author_same_subreddit(self):
@@ -139,19 +140,19 @@ class RedditETLTest(TestCase):
             different_author_same_subreddit_submission
         )
         # Check there are two distinct authors
-        self.assertTrue(Author.objects.get(name=submission.author).exists())
+        self.assertTrue(Author.objects.get(name=submission.author))
         self.assertTrue(
             Author.objects.get(
                 name=different_author_same_subreddit_submission.author
-            ).exists()
+            )
         )
         self.assertEquals(Author.objects.count(), 2)
         # Check there's only one subreddit saved
-        self.assertTrue(Subreddit.objects.get(name=submission.subreddit).exists())
+        self.assertTrue(Subreddit.objects.get(name=submission.subreddit))
         self.assertEquals(Subreddit.objects.count(), 1)
         # Check there's two submissions
-        self.assertTrue(Submission.objects.get(id=submission.id).exists())
-        self.assertEquals(Subreddit.objects.count(), 2)
+        self.assertTrue(Submission.objects.get(id=submission.id))
+        self.assertEquals(Submission.objects.count(), 2)
 
     def test_load_submission_duplicate_submission(self):
         """
@@ -162,11 +163,11 @@ class RedditETLTest(TestCase):
         self.instance._load_submission(submission)
         self.instance._load_submission(submission)
         # Check that only one Author, Subreddit, Submission has been loaded
-        self.assertTrue(Author.objects.get(name=submission.author).exists())
+        self.assertTrue(Author.objects.get(name=submission.author))
         self.assertEquals(Author.objects.count(), 1)
-        self.assertTrue(Subreddit.objects.get(name=submission.subreddit).exists())
+        self.assertTrue(Subreddit.objects.get(name=submission.subreddit))
         self.assertEquals(Subreddit.objects.count(), 1)
-        self.assertTrue(Submission.objects.get(id=submission.id).exists())
+        self.assertTrue(Submission.objects.get(id=submission.id))
         self.assertEquals(Subreddit.objects.count(), 1)
 
     def test_load_submission_EOM(self):
@@ -176,28 +177,41 @@ class RedditETLTest(TestCase):
         # TODO:
         pass
 
+
     def test_load_submission_invalid_map_func_plus_recovery(self):
         """
         Test that loading invalid models doesn't work.
         Test that the one atempted invalid insertion doesn't break the functionality.
         """
         # Define some invalid function
-        def invalid_test_func(f, param):
-            raise Exception("Expected Exception " + param)
+        class InvalidObject(object):
+            def __init__(self, invalid_attr) -> None:
+                self.invalid_attr = invalid_attr
 
-        self.instance.AUTHOR_MAP["invalid"] = (invalid_test_func, "invalid_field")
+            def __getattribute__(self, __name: str):
+                raise Exception("Always raises exception")
+
+            def __str__(self) -> str:
+                return self.invalid_attr
+
+        invalid_obj = InvalidObject("invalid_attr")
         post = self.get_example_submission()
-        self.assertRaises(Exception, self.instance._load_submission(post), name='Raise Exception with invalid load')
+        post.title = invalid_obj
+        
+        # Expected behaviour is 
+        self.instance._load_submission(post)
         # Check that invalid model hasn't been loaded
+        # Author, Subreddit, Submission should be added in one transaction
         self.assertEquals(Author.objects.count(), 0)
         self.assertEquals(Subreddit.objects.count(), 0)
-        self.assertEquals(Subreddit.objects.count(), 0)
+        self.assertEquals(Submission.objects.count(), 0)
         # Check that you can still perform valid inserts after failure
-        self.instance.AUTHOR_MAP.pop("invalid")
         self.instance._load_submission(post)
         self.assertEquals(Author.objects.count(), 1)
         self.assertEquals(Subreddit.objects.count(), 1)
         self.assertEquals(Subreddit.objects.count(), 1)
+        # Restore the AUTHOR_MAP back to the original format
+        self.instance.AUTHOR_MAP.pop("invalid")
 
     def test_transform_top_submissions_valid_input(self):
         """

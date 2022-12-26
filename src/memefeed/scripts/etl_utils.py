@@ -21,4 +21,4 @@ def unix_timestamp_getattr(submission: praw.models.Submission, field_to_get: str
 
 def filter_null_getattr(submission: praw.models.Submission, field_to_get: str):
     attr = getattr(submission, field_to_get)
-    return attr if not None else {}
+    return attr if attr is not None else {}
