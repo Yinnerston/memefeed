@@ -2,7 +2,8 @@
 Test cases for reddit_etl.py script.
 """
 from django.test import TestCase
-from .reddit_etl import RedditETL
+from django.db.models import ForeignKey
+from .reddit_etl import RedditETL, author_getattr, subreddit_getattr
 from reddit.models import Author, Subreddit, Submission
 import httpretty
 import praw
@@ -49,12 +50,35 @@ class RedditETLTest(TestCase):
         
         # Load submission into db
         loaded_submission = self.test_instance.__load_submission(submission)
+        saved_author = Author.objects.get(name=submission.author.name)
+        saved_subreddit = Subreddit.objects.get(name=submission.subreddit.display_name)
+        saved_submission = Submission.objects.get(id=submission.id)
         # Check that Author is in database
-        self.assertTrue(Author.objects.get(name=submission.author).exists())
+        self.assertTrue(saved_author.exists())
         # Check that Subreddit is in database
-        self.assertTrue(Subreddit.objects.get(name=submission.subreddit).exists())
+        self.assertTrue(saved_subreddit.exists())
         # Check that submission is in database
-        self.assertTrue(Submission.objects.get(id=submission.id).exists())
+        self.assertTrue(saved_submission.exists())
+        # Check that the fields are correct
+        self.assertEqual(saved_author.name , loaded_submission.author.name)
+        self.assertEqual(saved_subreddit.name, loaded_submission.subreddit.display_name)
+        for field in Submission._meta.get_fields():
+            field_name = field.name
+            field_value = getattr(saved_submission, field_name)
+            attr_name_before_map = self.test_instance.SUBMISSION_MAP[field_name][1]
+            
+            if isinstance(field, ForeignKey):
+                # Foreign keys 
+                if field_name == "author":
+                    self.assertEquals(field_value, author_getattr(loaded_submission, field_name))
+                elif field_name == "subreddit":
+                    self.assertEquals(field_value, subreddit_getattr(loaded_submission, field_name))
+            elif field_name == attr_name_before_map:
+                # Field names in Submission is the same as returned by praw
+                self.assertEquals(field_value, getattr(loaded_submission, field_name))
+            else:
+                # Field name is different
+                self.assertEquals(field_value, getattr(loaded_submission, attr_name_before_map))
 
     def test_load_submission_submission_is_none(self):
         submission = None # Some invalid submission

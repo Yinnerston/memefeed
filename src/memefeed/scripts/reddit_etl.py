@@ -8,6 +8,7 @@ from re import match
 import sentry_sdk
 # import requests
 
+from scripts.etl_utils import *
 from reddit.models import Author, Subreddit, Submission
 from django.db import models
 
@@ -25,6 +26,7 @@ from itertools import zip_longest
 # Fix model transformation mapping `python manage.py shell < scripts/reddit_etl.py`
 # Staging files (?)
 # 
+
 
 class RedditETL:
     """
@@ -63,7 +65,6 @@ class RedditETL:
 
 
     CACHE_DIR = "./cache"
-    SUBREDDITS_CSV = "scripts/data/subreddits.csv"
     
     # Dict mapping
     ACCEPTED_FIELDS = [
@@ -88,22 +89,27 @@ class RedditETL:
         "secure_media_embed"
     ]
         
-    # Map 
+    # Mappings
+    # Key: attribute name in Django model
+    # Value: Tuple(
+    #   function to apply to praw.models.Submission or None
+    #   argument for above function or value that is attribute that is set in django model if function is None
+    # )
     AUTHOR_MAP = {
-        "name":(getattr, "author"),
+        "name":(author_getattr, "author"),
         # "favourite": (None, False),
     }
     # [f.name for f in Author._meta.get_fields()]
     # [f.name for f in Subreddit._meta.get_fields()]
     SUBREDDIT_MAP = {
-        "name":(getattr, "subreddit"),
+        "name":(subreddit_getattr, "subreddit"),
         # "favourite": (None, False),
     }
     SUBMISSION_MAP = {
         "title": (getattr, "title"),
         "score": (getattr, "score"),
         "url": (getattr, "url"),
-        "created_utc": (getattr, "created_utc"),
+        "created_utc": (unix_timestamp_getattr, "created_utc"),
         "domain": (getattr, "domain"),
         "id": (getattr, "id"),
         "is_self": (getattr, "is_self"),
@@ -118,8 +124,8 @@ class RedditETL:
         "secure_media": (getattr, "secure_media"),
         "secure_media_embed": (getattr, "secure_media_embed"),
         # Foreign keys
-        "author": (getattr, "author"),
-        "subreddit": (getattr, "subreddit"),
+        "author": (author_getattr, "author"),
+        "subreddit": (subreddit_getattr, "subreddit"),
     }
     MODEL_MAPPINGS = {
         "AUTHOR": AUTHOR_MAP,
@@ -131,11 +137,13 @@ class RedditETL:
     # TODO: Remove in production alongside usage in extract()
     # N_submissionS_PER_SUBREDDIT = 50
 
-    def __init__(self):
+    def __init__(self, subreddits_csv="scripts/data/subreddits.csv"):
         # Auth information is contained in praw.ini file. See setup.md
         self.reddit = praw.Reddit("memefeedbot")
         # Comment this out if you need
         self.reddit.read_only = True
+
+        self.SUBREDDITS_CSV = subreddits_csv
         # TODO: Potentially used to backfill data (?)
         # self.pushshift = pmaw.PushshiftAPI(praw=self.reddit)
         # Sentry monitoring:
@@ -174,16 +182,14 @@ class RedditETL:
             # To avoid race condition? TODO: Do i need to save() author, subreddit before submission?
             # Convert Dict to django model
             if model_name == "AUTHOR":
-                output_model["name"] = output_model["name"].name
                 obj, created = Author.objects.get_or_create(**output_model)
                 foreign_key_dependencies["author"] = {
-                    "submission": obj
+                    "submission": obj  # Primary key of Author used by Submission
                 }
             elif model_name == "SUBREDDIT":
-                output_model["name"] = output_model["name"].display_name
                 obj, created = Subreddit.objects.get_or_create(**output_model)
                 foreign_key_dependencies["subreddit"] = {
-                    "submission": obj
+                    "submission": obj  # Primary key of Subreddit used by Submission
                 }
             elif model_name == "SUBMISSION":
                 # TODO: Does this create duplicates (?)
@@ -219,7 +225,7 @@ class RedditETL:
         Extracts the top N_submissionS_PER_SUBREDDIT from each subreddit in SUBREDDITS_CSV
         """
         submissions = []
-        with open(RedditETL.SUBREDDITS_CSV, newline="") as subreddits_csv:
+        with open(self.SUBREDDITS_CSV, newline="") as subreddits_csv:
             subreddit_reader = reader(subreddits_csv)
             for row in subreddit_reader:
                 # Prune invalid strings / validate strings according to reddit subreddit naming convention
@@ -258,7 +264,6 @@ class RedditETL:
         # return transpose
 
 
-RedditETL().run_pipeline()
 # Considerations:
 # Failure recovery --> Responses are cached, should I retry until finished?
 # What about rate limits?
