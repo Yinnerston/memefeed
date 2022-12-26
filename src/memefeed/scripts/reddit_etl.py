@@ -89,10 +89,16 @@ class RedditETL:
     ]
         
     # Map 
-    AUTHOR_MAP = {"name":(getattr, "author"), "favourite": (None, False)}
+    AUTHOR_MAP = {
+        "name":(getattr, "author"),
+        # "favourite": (None, False),
+    }
     # [f.name for f in Author._meta.get_fields()]
     # [f.name for f in Subreddit._meta.get_fields()]
-    SUBREDDIT_MAP = {"name":(getattr, "subreddit"), "favourite": (None, False)}
+    SUBREDDIT_MAP = {
+        "name":(getattr, "subreddit"),
+        # "favourite": (None, False),
+    }
     SUBMISSION_MAP = {
         "title": (getattr, "title"),
         "score": (getattr, "score"),
@@ -187,7 +193,7 @@ class RedditETL:
             # Save models so they can be accessed by foreign key
             if created:
                 obj.save()
-        return created_model
+        return obj
 
     def __transform_top_submissions(self, top_submissions):
         """
@@ -198,6 +204,9 @@ class RedditETL:
             self.__load_submission(submission)
             for submission in top_submissions
         ]
+        # DEBUG:
+        for i in transformed_submissions:
+            print(i)
         return transformed_submissions
 
         # filtered_attributes_list = [(self.__load_submission(submission, model) for model_name, model in RedditETL.MODEL_MAPPINGS.items()) for submission in top_submissions]
