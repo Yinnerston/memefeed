@@ -49,7 +49,7 @@ class RedditETLTest(TestCase):
         submission = self.get_example_submission()
 
         # Load submission into db
-        loaded_submission = self.instance.__load_submission(submission)
+        loaded_submission = self.instance._load_submission(submission)
         saved_author = Author.objects.get(name=submission.author.name)
         saved_subreddit = Subreddit.objects.get(name=submission.subreddit.display_name)
         saved_submission = Submission.objects.get(id=submission.id)
@@ -89,7 +89,7 @@ class RedditETLTest(TestCase):
     def test_load_submission_submission_is_none(self):
         submission = None  # Some invalid submission
         # Load submission into db
-        loaded_submission = self.instance.__load_submission(submission)
+        loaded_submission = self.instance._load_submission(submission)
         self.assertIs(loaded_submission, {})
         # Check that Author is in database
         self.assertFalse(Author.objects.get(name=submission.author).exists())
@@ -107,8 +107,8 @@ class RedditETLTest(TestCase):
         # To the database
         submission = self.instance.reddit.submission("zvms2j")
         duplicate_author_submission = self.get_example_submission()
-        submission_loaded_first = self.instance.__load_submission(submission)
-        submission_loaded_second = self.instance.__load_submission(
+        submission_loaded_first = self.instance._load_submission(submission)
+        submission_loaded_second = self.instance._load_submission(
             duplicate_author_submission
         )
         # Check that there's only one author saved
@@ -133,8 +133,8 @@ class RedditETLTest(TestCase):
         different_author_same_subreddit_submission = self.instance.reddit.submission(
             "zvn17h"
         )
-        submission_loaded_first = self.instance.__load_submission(submission)
-        submission_loaded_second = self.instance.__load_submission(
+        submission_loaded_first = self.instance._load_submission(submission)
+        submission_loaded_second = self.instance._load_submission(
             different_author_same_subreddit_submission
         )
         # Check there are two distinct authors
@@ -157,9 +157,9 @@ class RedditETLTest(TestCase):
         Check that the same submission loaded twice, only loads into the database once without duplication.
         """
         submission = self.get_example_submission()
-        # Load same submission twice using __load_submission
-        self.instance.__load_submission(submission)
-        self.instance.__load_submission(submission)
+        # Load same submission twice using _load_submission
+        self.instance._load_submission(submission)
+        self.instance._load_submission(submission)
         # Check that only one Author, Subreddit, Submission has been loaded
         self.assertTrue(Author.objects.get(name=submission.author).exists())
         self.assertEquals(Author.objects.count(), 1)
@@ -186,14 +186,14 @@ class RedditETLTest(TestCase):
 
         self.instance.AUTHOR_MAP["invalid"] = (invalid_test_func, "invalid_field")
         post = self.get_example_submission()
-        self.instance.__load_submission(post)
+        self.instance._load_submission(post)
         # Check that invalid model hasn't been loaded
         self.assertEquals(Author.objects.count(), 0)
         self.assertEquals(Subreddit.objects.count(), 0)
         self.assertEquals(Subreddit.objects.count(), 0)
         # Check that you can still perform valid inserts after failure
         self.instance.AUTHOR_MAP.pop("invalid")
-        self.instance.__load_submission(post)
+        self.instance._load_submission(post)
         self.assertEquals(Author.objects.count(), 1)
         self.assertEquals(Subreddit.objects.count(), 1)
         self.assertEquals(Subreddit.objects.count(), 1)
@@ -205,7 +205,7 @@ class RedditETLTest(TestCase):
         submissions_list = self.instance.reddit.subreddit("funny").top(
             limit=1, time_filter="day"
         )
-        transformed = self.instance.__transform_top_submissions(submissions_list)
+        transformed = self.instance._transform_top_submissions(submissions_list)
         self.assertEquals(Author.objects.count(), 1)
         self.assertEquals(Subreddit.objects.count(), 1)
         self.assertEquals(Subreddit.objects.count(), 1)

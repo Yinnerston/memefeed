@@ -156,7 +156,7 @@ class RedditETL:
             traces_sample_rate=1.0,
         )
 
-    def __load_submission(self, submission: praw.models.Submission):
+    def _load_submission(self, submission: praw.models.Submission):
         """
         Build dictionary that applies map_func to each value.
         """
@@ -166,7 +166,7 @@ class RedditETL:
                 "Attempted to load non praw.models.Submission type in "
                 + self.__class__.__name__
                 + "with"
-                + self.__class__.__load_submission.__name__
+                + self.__class__._load_submission.__name__
                 + str(submission)
             )
             return {}
@@ -208,20 +208,20 @@ class RedditETL:
                 obj.save()
         return obj
 
-    def __transform_top_submissions(self, top_submissions):
+    def _transform_top_submissions(self, top_submissions):
         """
         Transform top submissions to (author: Author, subreddit: dict, submission: dict)
          for model processing.
         """
         transformed_submissions = [
-            self.__load_submission(submission) for submission in top_submissions
+            self._load_submission(submission) for submission in top_submissions
         ]
         # DEBUG:
         for i in transformed_submissions:
             print(i)
         return transformed_submissions
 
-        # filtered_attributes_list = [(self.__load_submission(submission, model) for model_name, model in RedditETL.MODEL_MAPPINGS.items()) for submission in top_submissions]
+        # filtered_attributes_list = [(self._load_submission(submission, model) for model_name, model in RedditETL.MODEL_MAPPINGS.items()) for submission in top_submissions]
         # Return transposed filtered_attributes_list
         # return list(map(list, zip_longest(*filtered_attributes_list, fillvalue=None)))
 
@@ -248,7 +248,7 @@ class RedditETL:
                         )
 
                         # {k:v for k, v in submission if k in RedditETL.ACCEPTED_FIELDS}
-                        transformed_submissions = self.__transform_top_submissions(
+                        transformed_submissions = self._transform_top_submissions(
                             top_submissions
                         )
                         # transformed_submissions = [submission for submission in top_submissions]
