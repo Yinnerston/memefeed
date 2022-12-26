@@ -6,7 +6,6 @@ Moved draft functions here
 #         pass
 
 
-
 #     def get_daily_posts(self, subreddit):
 #         # Pushshift is too buggy...
 #         top_submissions = requests.get(f"https://api.pushshift.io/reddit/search/submission/?subreddit={subreddit}&after=1d\
@@ -26,7 +25,7 @@ Moved draft functions here
 
 #     def extract_info(self):
 #         """
-#         You need id to get batches.. 
+#         You need id to get batches..
 #         """
 #         posts = []
 #         with open(RedditETL.SUBREDDITS_CSV, newline="") as subreddits_csv:

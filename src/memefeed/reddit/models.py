@@ -1,25 +1,32 @@
 from django.db import models
 
+
 class Author(models.Model):
     """
     Author of a submission.
     """
+
     name = models.CharField(primary_key=True, max_length=20)
     favourite = models.BooleanField(default=False)
+
     def __str__(self) -> str:
         return self.name
+
 
 class Subreddit(models.Model):
     """
     Subreddit.
     """
+
     name = models.CharField(primary_key=True, max_length=21)
     favourite = models.BooleanField(default=False)
+
 
 class Submission(models.Model):
     """
     Submission made on a subreddit by an Author.
     """
+
     id = models.CharField("Reddit post's ID", max_length=6, primary_key=True)
     title = models.CharField("Title of a Reddit post", max_length=300)
     score = models.IntegerField("Number of upvotes on a reddit post")
@@ -42,6 +49,3 @@ class Submission(models.Model):
     # Foreign Keys
     subreddit = models.ForeignKey(Subreddit, models.CASCADE)
     author = models.ForeignKey(Author, models.CASCADE)
-
-
-

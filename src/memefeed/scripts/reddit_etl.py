@@ -2,10 +2,12 @@
 Extract daily top reddit submissions for each subreddit in SUBREDDITS_CSV.
 """
 import praw
+
 # import pmaw
 from csv import reader
 from re import match
 import sentry_sdk
+
 # import requests
 
 from scripts.etl_utils import *
@@ -25,14 +27,14 @@ from itertools import zip_longest
 # TODO: Pushshift is pretty unreliable
 # Fix model transformation mapping `python manage.py shell < scripts/reddit_etl.py`
 # Staging files (?)
-# 
+#
 
 
 class RedditETL:
     """
     Class that ingests data from reddit and puts it into the submissiongres db.
 
-    
+
     Functional dependencies:
     id -> title, author, score, url, domain, subreddit, over_18, is_self, is_video
     id -> shortlink (https://redd.it/{id})
@@ -63,9 +65,8 @@ class RedditETL:
     # "secure_media " + str(submission.secure_media),
     # "secure_media_embed " + str(submission.secure_media_embed),
 
-
     CACHE_DIR = "./cache"
-    
+
     # Dict mapping
     ACCEPTED_FIELDS = [
         "title",
@@ -86,9 +87,9 @@ class RedditETL:
         "over_18",
         "thumbnail",
         "secure_media",
-        "secure_media_embed"
+        "secure_media_embed",
     ]
-        
+
     # Mappings
     # Key: attribute name in Django model
     # Value: Tuple(
@@ -96,13 +97,13 @@ class RedditETL:
     #   argument for above function or value that is attribute that is set in django model if function is None
     # )
     AUTHOR_MAP = {
-        "name":(author_getattr, "author"),
+        "name": (author_getattr, "author"),
         # "favourite": (None, False),
     }
     # [f.name for f in Author._meta.get_fields()]
     # [f.name for f in Subreddit._meta.get_fields()]
     SUBREDDIT_MAP = {
-        "name":(subreddit_getattr, "subreddit"),
+        "name": (subreddit_getattr, "subreddit"),
         # "favourite": (None, False),
     }
     SUBMISSION_MAP = {
@@ -130,10 +131,9 @@ class RedditETL:
     MODEL_MAPPINGS = {
         "AUTHOR": AUTHOR_MAP,
         "SUBREDDIT": SUBREDDIT_MAP,
-        "SUBMISSION": SUBMISSION_MAP 
+        "SUBMISSION": SUBMISSION_MAP,
     }
-    
-    
+
     # TODO: Remove in production alongside usage in extract()
     # N_submissionS_PER_SUBREDDIT = 50
 
@@ -162,10 +162,13 @@ class RedditETL:
         """
         # Only take submissions in input
         if type(submission) is not praw.models.Submission:
-            sentry_sdk.capture_message("Attempted to load non praw.models.Submission type in " 
-            + self.__class__.__name__
-            + "with" + self.__class__.__load_submission.__name__
-            + str(submission))
+            sentry_sdk.capture_message(
+                "Attempted to load non praw.models.Submission type in "
+                + self.__class__.__name__
+                + "with"
+                + self.__class__.__load_submission.__name__
+                + str(submission)
+            )
             return {}
         foreign_key_dependencies = {}
         obj = None
@@ -193,8 +196,12 @@ class RedditETL:
                 }
             elif model_name == "SUBMISSION":
                 # TODO: Does this create duplicates (?)
-                output_model["subreddit"] = foreign_key_dependencies["subreddit"]["submission"]
-                output_model["author"] = foreign_key_dependencies["author"]["submission"]
+                output_model["subreddit"] = foreign_key_dependencies["subreddit"][
+                    "submission"
+                ]
+                output_model["author"] = foreign_key_dependencies["author"][
+                    "submission"
+                ]
                 obj, created = Submission.objects.get_or_create(**output_model)
             # Save models so they can be accessed by foreign key
             if created:
@@ -207,8 +214,7 @@ class RedditETL:
          for model processing.
         """
         transformed_submissions = [
-            self.__load_submission(submission)
-            for submission in top_submissions
+            self.__load_submission(submission) for submission in top_submissions
         ]
         # DEBUG:
         for i in transformed_submissions:
@@ -218,7 +224,6 @@ class RedditETL:
         # filtered_attributes_list = [(self.__load_submission(submission, model) for model_name, model in RedditETL.MODEL_MAPPINGS.items()) for submission in top_submissions]
         # Return transposed filtered_attributes_list
         # return list(map(list, zip_longest(*filtered_attributes_list, fillvalue=None)))
-
 
     def run_pipeline(self):
         """
@@ -239,12 +244,13 @@ class RedditETL:
                     try:
                         # Get top N submissions daily from each subreddit in the list
                         top_submissions = self.reddit.subreddit(subreddit).top(
-                            time_filter="day",
-                            limit=5 # TODO: REMOVE THIS
+                            time_filter="day", limit=5  # TODO: REMOVE THIS
                         )
 
                         # {k:v for k, v in submission if k in RedditETL.ACCEPTED_FIELDS}
-                        transformed_submissions = self.__transform_top_submissions(top_submissions)
+                        transformed_submissions = self.__transform_top_submissions(
+                            top_submissions
+                        )
                         # transformed_submissions = [submission for submission in top_submissions]
                     except praw.exceptions.PRAWException as err:
                         # On error, report to Sentry
@@ -253,14 +259,14 @@ class RedditETL:
                         # TODO: Join subreddit --> Subreddit model
                         # TODO: Join author --> author model
                         # TODO: Batch load to submissiongres
-                        submissions += transformed_submissions  
+                        submissions += transformed_submissions
         # Transpose list
         # transpose = list(map(list, zip_longest(*submissions, fillvalue=None)))
         # print("LEN TRANSPOSE", len(transpose))
         # for i in transpose:
         #     print("LEN I", len(i))
         #     print(i)
-            
+
         # return transpose
 
 
