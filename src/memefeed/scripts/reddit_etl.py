@@ -1,3 +1,6 @@
+"""
+Extract daily top reddit submissions for each subreddit in SUBREDDITS_CSV.
+"""
 import praw
 # import pmaw
 from csv import reader
@@ -25,7 +28,7 @@ from itertools import zip_longest
 
 class RedditETL:
     """
-    Class that ingests data from reddit and puts it into the postgres db.
+    Class that ingests data from reddit and puts it into the submissiongres db.
 
     
     Functional dependencies:
@@ -37,26 +40,26 @@ class RedditETL:
 
     """
 
-    # "id " + str(post.id),
-    # "title " + str(post.title),
-    # "author " + str(post.author),
-    # "score " + str(post.score),
-    # "url " + str(post.url), # Otherwise a link to a url?
-    # "domain " + str(post.domain),
-    # "subreddit " + str(post.subreddit),
-    # # "subreddit_id " + str(post.subreddit_id),
-    # "created_utc " + str(post.created_utc),
-    # "is_self " + str(post.is_self),  # if True, only text
-    # "is_video " + str(post.is_video),  # If True, then video in media
-    # "media " + str(post.media),
-    # "media_embed " + str(post.media_embed),
-    # "media_only " + str(post.media_only),
-    # "selftext " + str(post.selftext),
-    # "selftext_html " + str(post.selftext_html),
-    # "over_18 " + str(post.over_18),  # if True, thumbnail is nsfw
-    # "thumbnail " + str(post.thumbnail),  # Either jpg url, nsfw or none
-    # "secure_media " + str(post.secure_media),
-    # "secure_media_embed " + str(post.secure_media_embed),
+    # "id " + str(submission.id),
+    # "title " + str(submission.title),
+    # "author " + str(submission.author),
+    # "score " + str(submission.score),
+    # "url " + str(submission.url), # Otherwise a link to a url?
+    # "domain " + str(submission.domain),
+    # "subreddit " + str(submission.subreddit),
+    # # "subreddit_id " + str(submission.subreddit_id),
+    # "created_utc " + str(submission.created_utc),
+    # "is_self " + str(submission.is_self),  # if True, only text
+    # "is_video " + str(submission.is_video),  # If True, then video in media
+    # "media " + str(submission.media),
+    # "media_embed " + str(submission.media_embed),
+    # "media_only " + str(submission.media_only),
+    # "selftext " + str(submission.selftext),
+    # "selftext_html " + str(submission.selftext_html),
+    # "over_18 " + str(submission.over_18),  # if True, thumbnail is nsfw
+    # "thumbnail " + str(submission.thumbnail),  # Either jpg url, nsfw or none
+    # "secure_media " + str(submission.secure_media),
+    # "secure_media_embed " + str(submission.secure_media_embed),
 
 
     CACHE_DIR = "./cache"
@@ -120,7 +123,7 @@ class RedditETL:
     
     
     # TODO: Remove in production alongside usage in extract()
-    # N_POSTS_PER_SUBREDDIT = 50
+    # N_submissionS_PER_SUBREDDIT = 50
 
     def __init__(self):
         # Auth information is contained in praw.ini file. See setup.md
@@ -139,23 +142,30 @@ class RedditETL:
             traces_sample_rate=1.0,
         )
 
-    def __load_post(self, post):
+    def __load_submission(self, submission: praw.models.Submission):
         """
         Build dictionary that applies map_func to each value.
         """
+        # Only take submissions in input
+        if type(submission) is not praw.models.Submission:
+            sentry_sdk.capture_message("Attempted to load non praw.models.Submission type in " 
+            + self.__class__.__name__
+            + "with" + self.__class__.__load_submission.__name__
+            + str(submission))
+            return {}
         foreign_key_dependencies = {}
+        created_model = {}
         for model_name, model in RedditETL.MODEL_MAPPINGS.items():
-            # Convert post to the corresponding dict
+            # Convert submission to the corresponding dict for django model **kwargs
             output_model = {}
             for k, v in model.items():
                 map_func, attr_val = v
                 if map_func is not None:
-                    output_model[k] = map_func(post, attr_val)
+                    output_model[k] = map_func(submission, attr_val)
                 else:
                     output_model[k] = attr_val
-            # TODO: Do i need to save() author, subreddit before submission?
-            # To avoid race condition?
-            created_model = {}
+            # To avoid race condition? TODO: Do i need to save() author, subreddit before submission?
+            # Convert Dict to django model
             if model_name == "AUTHOR":
                 output_model["name"] = output_model["name"].name
                 created_model = Author(**output_model)
@@ -177,27 +187,27 @@ class RedditETL:
             created_model.save()
         return created_model
 
-    def __transform_top_posts(self, top_posts):
+    def __transform_top_submissions(self, top_submissions):
         """
-        Transform top posts to (author: dict, subreddit: dict, submission: dict)
+        Transform top submissions to (author: Author, subreddit: dict, submission: dict)
          for model processing.
         """
-        transformed_posts = [
-            self.__load_post(post)
-            for post in top_posts
+        transformed_submissions = [
+            self.__load_submission(submission)
+            for submission in top_submissions
         ]
-        return transformed_posts
+        return transformed_submissions
 
-        # filtered_attributes_list = [(self.__load_post(post, model) for model_name, model in RedditETL.MODEL_MAPPINGS.items()) for post in top_posts]
+        # filtered_attributes_list = [(self.__load_submission(submission, model) for model_name, model in RedditETL.MODEL_MAPPINGS.items()) for submission in top_submissions]
         # Return transposed filtered_attributes_list
         # return list(map(list, zip_longest(*filtered_attributes_list, fillvalue=None)))
 
 
     def extract(self):
         """
-        Extracts the top N_POSTS_PER_SUBREDDIT from each subreddit in SUBREDDITS_CSV
+        Extracts the top N_submissionS_PER_SUBREDDIT from each subreddit in SUBREDDITS_CSV
         """
-        posts = []
+        submissions = []
         with open(RedditETL.SUBREDDITS_CSV, newline="") as subreddits_csv:
             subreddit_reader = reader(subreddits_csv)
             for row in subreddit_reader:
@@ -208,27 +218,27 @@ class RedditETL:
                 # Iterate over subreddits
 
                 for subreddit in valid_subreddits_in_row:
-                    top_posts = []
+                    top_submissions = []
                     try:
-                        # Get top N posts daily from each subreddit in the list
-                        top_posts = self.reddit.subreddit(subreddit).top(
+                        # Get top N submissions daily from each subreddit in the list
+                        top_submissions = self.reddit.subreddit(subreddit).top(
                             time_filter="day",
                             limit=5 # TODO: REMOVE THIS
                         )
 
-                        # {k:v for k, v in post if k in RedditETL.ACCEPTED_FIELDS}
-                        transformed_posts = self.__transform_top_posts(top_posts)
-                        # transformed_posts = [post for post in top_posts]
+                        # {k:v for k, v in submission if k in RedditETL.ACCEPTED_FIELDS}
+                        transformed_submissions = self.__transform_top_submissions(top_submissions)
+                        # transformed_submissions = [submission for submission in top_submissions]
                     except praw.exceptions.PRAWException as err:
                         # On error, report to Sentry
                         sentry_sdk.capture_exception(err)
                     else:
                         # TODO: Join subreddit --> Subreddit model
                         # TODO: Join author --> author model
-                        # TODO: Batch load to postgres
-                        posts += transformed_posts  
+                        # TODO: Batch load to submissiongres
+                        submissions += transformed_submissions  
         # Transpose list
-        transpose = list(map(list, zip_longest(*posts, fillvalue=None)))
+        transpose = list(map(list, zip_longest(*submissions, fillvalue=None)))
         print("LEN TRANSPOSE", len(transpose))
         for i in transpose:
             print("LEN I", len(i))
@@ -238,13 +248,13 @@ class RedditETL:
 
 
 
-    def load(self, posts):
+    def load(self, submissions):
         """
-        Batch load into postgres and join with related data models
+        Batch load into submissiongres and join with related data models
         """
         # TODO: Change this func as bulk_create doesn't work with models using foreign keys
-        # Posts is a list [ [Authors..], [Subreddits..], [Submissions..]]
-        authors, subreddits, submissions = posts
+        # submissions is a list [ [Authors..], [Subreddits..], [Submissions..]]
+        authors, subreddits, submissions = submissions
         Author.objects.bulk_create(authors)
         Subreddit.objects.bulk_create(subreddits)
         Submission.objects.bulk_create(submissions)
@@ -253,7 +263,7 @@ class RedditETL:
         """
         Run ETL pipeline.
         """
-        # self.get_daily_posts("anime_irl")
+        # self.get_daily_submissions("anime_irl")
         res = self.extract()
         # Transform does nothing right now as transform functionality is in extract
         res = self.load(res)
