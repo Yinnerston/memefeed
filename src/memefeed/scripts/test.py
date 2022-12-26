@@ -90,7 +90,7 @@ class RedditETLTest(TestCase):
         submission = None  # Some invalid submission
         # Load submission into db
         loaded_submission = self.instance._load_submission(submission)
-        self.assertIs(loaded_submission, {})
+        self.assertEquals(loaded_submission, {})
         # Check that Author is in database
         self.assertFalse(Author.objects.get(name=submission.author).exists())
         # Check that Subreddit is in database
@@ -181,12 +181,12 @@ class RedditETLTest(TestCase):
         Test that the one atempted invalid insertion doesn't break the functionality.
         """
         # Define some invalid function
-        def invalid_test_func(param):
+        def invalid_test_func(f, param):
             raise Exception("Expected Exception " + param)
 
         self.instance.AUTHOR_MAP["invalid"] = (invalid_test_func, "invalid_field")
         post = self.get_example_submission()
-        self.instance._load_submission(post)
+        self.assertRaises(Exception, self.instance._load_submission(post), name='Raise Exception with invalid load')
         # Check that invalid model hasn't been loaded
         self.assertEquals(Author.objects.count(), 0)
         self.assertEquals(Subreddit.objects.count(), 0)
