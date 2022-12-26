@@ -203,7 +203,7 @@ class RedditETL:
         # return list(map(list, zip_longest(*filtered_attributes_list, fillvalue=None)))
 
 
-    def extract(self):
+    def run_pipeline(self):
         """
         Extracts the top N_submissionS_PER_SUBREDDIT from each subreddit in SUBREDDITS_CSV
         """
@@ -238,35 +238,13 @@ class RedditETL:
                         # TODO: Batch load to submissiongres
                         submissions += transformed_submissions  
         # Transpose list
-        transpose = list(map(list, zip_longest(*submissions, fillvalue=None)))
-        print("LEN TRANSPOSE", len(transpose))
-        for i in transpose:
-            print("LEN I", len(i))
-            print(i)
+        # transpose = list(map(list, zip_longest(*submissions, fillvalue=None)))
+        # print("LEN TRANSPOSE", len(transpose))
+        # for i in transpose:
+        #     print("LEN I", len(i))
+        #     print(i)
             
-        return transpose
-
-
-
-    def load(self, submissions):
-        """
-        Batch load into submissiongres and join with related data models
-        """
-        # TODO: Change this func as bulk_create doesn't work with models using foreign keys
-        # submissions is a list [ [Authors..], [Subreddits..], [Submissions..]]
-        authors, subreddits, submissions = submissions
-        Author.objects.bulk_create(authors)
-        Subreddit.objects.bulk_create(subreddits)
-        Submission.objects.bulk_create(submissions)
-
-    def run_pipeline(self):
-        """
-        Run ETL pipeline.
-        """
-        # self.get_daily_submissions("anime_irl")
-        res = self.extract()
-        # Transform does nothing right now as transform functionality is in extract
-        res = self.load(res)
+        # return transpose
 
 
 RedditETL().run_pipeline()
