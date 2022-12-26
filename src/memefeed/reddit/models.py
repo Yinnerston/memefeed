@@ -38,14 +38,14 @@ class Submission(models.Model):
     is_self = models.BooleanField(default=False)
     is_video = models.BooleanField(default=False)
     media_only = models.BooleanField(default=False)
-    media = models.JSONField(default=list, blank=True)
-    media_embed = models.JSONField(default=list)
+    media = models.JSONField(default=dict, blank=True)
+    media_embed = models.JSONField(default=dict)
     selftext = models.TextField(max_length=40000)
     selftext_html = models.TextField()  # TODO: Should this be binary?
     nsfw = models.BooleanField(default=False)
     thumbnail = models.URLField("Thumbnail URL")
-    secure_media = models.JSONField(default=list)
-    secure_media_embed = models.JSONField(default=list)
+    secure_media = models.JSONField(default=dict)
+    secure_media_embed = models.JSONField(default=dict)
     # Foreign Keys
     subreddit = models.ForeignKey(Subreddit, models.CASCADE)
     author = models.ForeignKey(Author, models.CASCADE)

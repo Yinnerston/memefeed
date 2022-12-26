@@ -122,7 +122,8 @@ class RedditETLTest(TestCase):
         self.assertEquals(Subreddit.objects.count(), 2)
         # Check that there are two submissions saved
         self.assertTrue(Submission.objects.get(id=submission.id).exists())
-        self.assertEquals(Subreddit.objects.count(), 2)
+        self.assertTrue(Submission.objects.get(id=duplicate_author_submission.id).exists())
+        self.assertEquals(Submission.objects.count(), 2)
 
     def test_load_submission_different_author_same_subreddit(self):
         """
