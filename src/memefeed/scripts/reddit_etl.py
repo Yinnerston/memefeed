@@ -1,5 +1,6 @@
 """
 Extract daily top reddit submissions for each subreddit in SUBREDDITS_CSV.
+Call this script in the manage.py shell from src/memefeed (/app in docker container)
 """
 import praw
 
@@ -12,22 +13,8 @@ import sentry_sdk
 
 from scripts.etl_utils import *
 from reddit.models import Author, Subreddit, Submission
-from django.db import models, DatabaseError, transaction
-
-from itertools import zip_longest
-
-# TODO:
-# See if pushshift is comprehensive index (?)
-# If it works for subreddit --> PUT into DB
-# If it doesn't work --> Use reddit API
-# Take IDS from pushshift --> batch read using reddit api
-# bulk_create() to load into model
-# Figure out how to do the foreign key3
-
-# TODO: Pushshift is pretty unreliable
-# Fix model transformation mapping `python manage.py shell < scripts/reddit_etl.py`
-# Staging files (?)
-#
+from django.db import DatabaseError, transaction
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class RedditETL:
@@ -44,28 +31,7 @@ class RedditETL:
 
     """
 
-    # "id " + str(submission.id),
-    # "title " + str(submission.title),
-    # "author " + str(submission.author),
-    # "score " + str(submission.score),
-    # "url " + str(submission.url), # Otherwise a link to a url?
-    # "domain " + str(submission.domain),
-    # "subreddit " + str(submission.subreddit),
-    # # "subreddit_id " + str(submission.subreddit_id),
-    # "created_utc " + str(submission.created_utc),
-    # "is_self " + str(submission.is_self),  # if True, only text
-    # "is_video " + str(submission.is_video),  # If True, then video in media
-    # "media " + str(submission.media),
-    # "media_embed " + str(submission.media_embed),
-    # "media_only " + str(submission.media_only),
-    # "selftext " + str(submission.selftext),
-    # "selftext_html " + str(submission.selftext_html),
-    # "over_18 " + str(submission.over_18),  # if True, thumbnail is nsfw
-    # "thumbnail " + str(submission.thumbnail),  # Either jpg url, nsfw or none
-    # "secure_media " + str(submission.secure_media),
-    # "secure_media_embed " + str(submission.secure_media_embed),
-
-    CACHE_DIR = "./cache"
+    # CACHE_DIR = "./cache"
 
     # Dict mapping
     ACCEPTED_FIELDS = [
@@ -100,8 +66,6 @@ class RedditETL:
         "name": (author_getattr, "author"),
         # "favourite": (None, False),
     }
-    # [f.name for f in Author._meta.get_fields()]
-    # [f.name for f in Subreddit._meta.get_fields()]
     SUBREDDIT_MAP = {
         "name": (subreddit_getattr, "subreddit"),
         # "favourite": (None, False),
@@ -134,20 +98,13 @@ class RedditETL:
         "SUBMISSION": SUBMISSION_MAP,
     }
 
-    # TODO: Remove in production alongside usage in extract()
-    # N_submissionS_PER_SUBREDDIT = 50
 
     def __init__(self, subreddits_csv="scripts/data/subreddits.csv"):
         # Auth information is contained in praw.ini file. See setup.md
         self.reddit = praw.Reddit("memefeedbot")
-        # Comment this out if you need
         self.reddit.read_only = True
 
         self.SUBREDDITS_CSV = subreddits_csv
-        # TODO: Potentially used to backfill data (?)
-        # self.pushshift = pmaw.PushshiftAPI(praw=self.reddit)
-        # Sentry monitoring:
-        # TODO: Isn't this already handled by django app?
         sentry_sdk.init(
             dsn="https://ef5d88ef4fe1411f8a626d67f8ee3317@o4504333010731009.ingest.sentry.io/4504365878673408",
             # Set traces_sample_rate to 1.0 to capture 100%
@@ -174,6 +131,7 @@ class RedditETL:
         obj = None
         created = None
         try:
+            # Each Reddit post --> (Author, Subreddit, Submission) is atomic
             with transaction.atomic():
                 for model_name, model in RedditETL.MODEL_MAPPINGS.items():                
                         # Convert submission to the corresponding dict for django model **kwargs
@@ -184,15 +142,23 @@ class RedditETL:
                                 output_model[k] = map_func(submission, attr_val)
                             else:
                                 output_model[k] = attr_val
-                        # To avoid race condition? TODO: Do i need to save() author, subreddit before submission?
-                        # Convert Dict to django model
+                        # use Try/Except with ObjectDoesNotExist because to avoid IntegrityError from unsanitized input
+                        # Only the first iteration of a post is saved. Subsequent runs do not insert / update
+                        # Convert output_model Dict to django model
+                        obj = None
                         if model_name == "AUTHOR":
-                            obj, created = Author.objects.get_or_create(**output_model)
+                            try:
+                                obj = Author.objects.get(name=output_model["name"])
+                            except ObjectDoesNotExist:
+                                obj = Author.objects.create(**output_model)
                             foreign_key_dependencies["author"] = {
                                 "submission": obj,  # Primary key of Author used by Submission
                             }
                         elif model_name == "SUBREDDIT":
-                            obj, created = Subreddit.objects.get_or_create(**output_model)
+                            try:
+                                obj = Subreddit.objects.get(name=output_model["name"])
+                            except ObjectDoesNotExist:
+                                obj = Subreddit.objects.create(**output_model)
                             foreign_key_dependencies["subreddit"] = {
                                 "submission": obj,  # Primary key of Subreddit used by Submission
                             }
@@ -203,8 +169,10 @@ class RedditETL:
                             output_model["author"] = foreign_key_dependencies["author"][
                                 "submission"
                             ]
-                            # TODO: Don't save until you've done all validations
-                            obj, created = Submission.objects.get_or_create(**output_model)
+                            try:
+                                obj = Submission.objects.get(id=output_model["id"])
+                            except ObjectDoesNotExist:
+                                obj = Submission.objects.create(**output_model)
                         
         except DatabaseError as e:
             # Expected behaviour for a invalid post is to report , ignore it and add subsequent posts
@@ -215,23 +183,19 @@ class RedditETL:
 
     def _transform_top_submissions(self, top_submissions):
         """
-        Transform top submissions to (author: Author, subreddit: dict, submission: dict)
-         for model processing.
+        Apply transformation to each submission in top_submissions.
+        Then load them into django postgres db.
         """
         transformed_submissions = [
             self._load_submission(submission) for submission in top_submissions
         ]
         return transformed_submissions
 
-        # filtered_attributes_list = [(self._load_submission(submission, model) for model_name, model in RedditETL.MODEL_MAPPINGS.items()) for submission in top_submissions]
-        # Return transposed filtered_attributes_list
-        # return list(map(list, zip_longest(*filtered_attributes_list, fillvalue=None)))
-
     def run_pipeline(self):
         """
         Extracts the top N_submissionS_PER_SUBREDDIT from each subreddit in SUBREDDITS_CSV
         """
-        submissions = []
+        
         with open(self.SUBREDDITS_CSV, newline="") as subreddits_csv:
             subreddit_reader = reader(subreddits_csv)
             for row in subreddit_reader:
@@ -246,31 +210,17 @@ class RedditETL:
                     try:
                         # Get top N submissions daily from each subreddit in the list
                         top_submissions = self.reddit.subreddit(subreddit).top(
-                            time_filter="day", limit=5  # TODO: REMOVE THIS
+                            time_filter="day"
                         )
 
                         # {k:v for k, v in submission if k in RedditETL.ACCEPTED_FIELDS}
-                        transformed_submissions = self._transform_top_submissions(
+                        self._transform_top_submissions(
                             top_submissions
                         )
                         # transformed_submissions = [submission for submission in top_submissions]
                     except praw.exceptions.PRAWException as err:
                         # On error, report to Sentry
                         sentry_sdk.capture_exception(err)
-                    else:
-                        # TODO: Join subreddit --> Subreddit model
-                        # TODO: Join author --> author model
-                        # TODO: Batch load to submissiongres
-                        submissions += transformed_submissions
-        # Transpose list
-        # transpose = list(map(list, zip_longest(*submissions, fillvalue=None)))
-        # print("LEN TRANSPOSE", len(transpose))
-        # for i in transpose:
-        #     print("LEN I", len(i))
-        #     print(i)
-
-        # return transpose
-
 
 # Considerations:
 # Failure recovery --> Responses are cached, should I retry until finished?
