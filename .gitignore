@@ -2,6 +2,9 @@
 template
 *venv
 
+# vscode
+.vscode
+
 # Django #
 *.log
 *.pot
@@ -9,6 +12,9 @@ template
 __pycache__
 db.sqlite3
 media
+
+# PRAW
+*.ini
 
 # Backup files # 
 *.bak 

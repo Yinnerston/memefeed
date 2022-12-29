@@ -1,0 +1,9 @@
+{% if top_submissions_list %}
+    <ul>
+    {% for submission in top_submissions_list %}
+        <li> {submission.title} by {submission.author} on r/{submission.subreddit} </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No submissions in DB.</p>
+{% endif %}
