@@ -3,6 +3,7 @@ from scripts.reddit_etl import RedditETL
 import sentry_sdk
 from reddit.forms import SearchForm
 from reddit.models import Author, Subreddit, Submission
+from http import HTTPStatus
 # Create your tests here.
 
 # Also testing some of the behaviour in `src\memefeed\scripts\test.py`
@@ -22,7 +23,7 @@ class SubmissionSearchFormTest(TestCase):
         cls.instance = RedditETL()
         sentry_sdk.init(dsn="")
         # Set up data for the whole TestCase
-        ids = [
+        cls.ids = [
             "t3_zvn17h",
             "t3_zvms2j",
             "t3_zvmrlj",
@@ -39,41 +40,82 @@ class SubmissionSearchFormTest(TestCase):
         """
         # Title corresponding to submission id=zvms2j
         exact_title = "First post on test_memefeed"
-        form = SearchForm({
-            "q": exact_title
+        response = self.client.get("/reddit/search/", data={
+            "q": exact_title,
+            "sort_by": 0
         })
-        if form.is_valid():
-            self.assertIsNotNone(form.cleaned_data)
-            self.assertEquals(len(form.cleaned_data), 1)
-
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertNotContains(
+            response, "No submissions found", html=True
+        )
 
     def test_search_filter_by_subreddit(self):
         """
         Test search by specific subreddit
         """
         # Title corresponding to submission id=zvms2j
-        subreddit = "test_memefeed"
-        form = SearchForm({
-            "subreddit": subreddit
+        response = self.client.get("/reddit/search/results", data={
+            "q": "",
+            "sort_by": 0,
+            "subreddit": "test_memefeed"
         })
-        if form.is_valid():
-            self.assertIsNotNone(form.cleaned_data)
-            # Check len is 3
-            self.assertEquals(len(form.cleaned_data), 3)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertNotContains(
+            response, "No submissions found", html=True
+        )
+        # Check all submissions are part of test_memefeed
+        results_list =  response.context['results_list']
+        self.assertEqual(len(results_list), 3)
+        for result in results_list:
+            self.assertEquals(result.subreddit.name, "test_memefeed")
 
     def test_search_filter_by_author(self):
         """
         Test search by specific author
         """
         # Title corresponding to submission id=zvms2j
-        author = "YinnerstonMemefeed"
-        form = SearchForm({
-            "author": author
+        response = self.client.get("/reddit/search/results", data={
+            "q": "",
+            "sort_by": 0,
+            "author":  "YinnerstonMemefeed"
         })
-        if form.is_valid():
-            self.assertIsNotNone(form.cleaned_data)
-            # Check len is 2
-            self.assertEqual(len(form.cleaned_data), 2)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertNotContains(
+            response, "No submissions found", html=True
+        )
+        # Check all submissions are part of test_memefeed
+        results_list =  response.context['results_list']
+        self.assertEqual(len(results_list), 2)
+        for result in results_list:
+            self.assertEquals(result.author.name, "YinnerstonMemefeed")
+
+    def test_empty_query_string_returns_all_results(self):
+        """
+        Test empty query string returns all results.
+        """
+        response = self.client.get("/reddit/search/results", data={
+            "q": "",
+            "sort_by": 0,
+        })
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertNotContains(
+            response, "No submissions found", html=True
+        )
+        # Check all submissions are present
+        results_list =  response.context['results_list']
+        self.assertEqual(len(results_list), len(self.ids))
+
+    def test_sort_by_relevance(self):
+        pass
+
+    def test_sort_by_score(self):
+        pass
+
+    def test_sort_by_new(self):
+        pass
+
+    def test_sort_by_alphabetical(self):
+        pass
 
     def test_search_by_invalid_title(self):
         """
@@ -92,5 +134,6 @@ class SubmissionSearchFormTest(TestCase):
         Test search for a title that is not in the database returns no results
         """
         pass
+
 
 # TODO: Django views / template testing
