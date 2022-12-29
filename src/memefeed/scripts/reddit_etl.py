@@ -142,14 +142,15 @@ class RedditETL:
                                 output_model[k] = map_func(submission, attr_val)
                             else:
                                 output_model[k] = attr_val
-                        # use Try/Except with ObjectDoesNotExist because the 
+                        # use Try/Except with ObjectDoesNotExist because to avoid IntegrityError from unsanitized input
+                        # Only the first iteration of a post is saved. Subsequent runs do not insert / update
                         # Convert output_model Dict to django model
                         obj = None
                         if model_name == "AUTHOR":
                             try:
                                 obj = Author.objects.get(name=output_model["name"])
                             except ObjectDoesNotExist:
-                                obj = Author.objects.create(**output_model)
+                                obj, created = Author.objects.update_or_create(**output_model)
                             foreign_key_dependencies["author"] = {
                                 "submission": obj,  # Primary key of Author used by Submission
                             }
