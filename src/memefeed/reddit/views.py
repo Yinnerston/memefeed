@@ -21,7 +21,9 @@ class IndexView(generic.ListView):
     context_object_name = "top_submissions_list"        
 
     def get_queryset(self):
-        """Return the last five published questions."""
+        """
+        Return the last five published questions.
+        """
         return Submission.objects.order_by("-score", "title")[:5]
 
 class SearchView(FormView):
@@ -34,7 +36,7 @@ class SearchView(FormView):
 
 class SearchResultsView(generic.ListView):
     """
-    View that displays the reuslts of a search
+    View that displays the results of a search
     """
     template_name = "reddit/results.html"
     context_object_name = "results_list"
@@ -42,6 +44,9 @@ class SearchResultsView(generic.ListView):
     # paginate_by = 50
 
     def get_queryset(self):
+        """
+        Handles generation of results.
+        """
         query = self.request.GET.get('q')
         subreddit = self.request.GET.get('subreddit')
         author = self.request.GET.get('author')
