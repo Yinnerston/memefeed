@@ -233,4 +233,6 @@ class RedditETLTest(TestCase):
         self.assertEquals(Subreddit.objects.count(), 1)
         self.assertEquals(Subreddit.objects.count(), 1)
 
-# TODO: More tests checking atomic commits
+    # TODO: More tests checking atomic commits
+    def test_atomic_commit(self):
+        pass
