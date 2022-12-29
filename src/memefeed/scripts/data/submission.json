@@ -5,9 +5,7 @@
         "score",
         "url",
         "subreddit",
-        "subreddit_id",
         "created_utc",
-
         "domain",
         "id",
         "is_self",
