@@ -18,6 +18,9 @@ class SearchForm(forms.Form):
         pass
     
 
-class IndexForm(SearchForm):
-    q = forms.CharField(label="Search Term", max_length=300)
+class IndexForm(forms.Form):
+    """
+    Search bar in homepage
+    """
+    q = forms.CharField(placeholder="Search Term", max_length=300, widget=forms.TextInput(attrs={'placeholder': 'Search by title'}))
 
