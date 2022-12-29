@@ -150,7 +150,7 @@ class RedditETL:
                             try:
                                 obj = Author.objects.get(name=output_model["name"])
                             except ObjectDoesNotExist:
-                                obj, created = Author.objects.update_or_create(**output_model)
+                                obj = Author.objects.create(**output_model)
                             foreign_key_dependencies["author"] = {
                                 "submission": obj,  # Primary key of Author used by Submission
                             }
