@@ -75,3 +75,20 @@ class SubmissionSearchFormTest(TestCase):
             # Check len is 2
             self.assertEqual(len(form.cleaned_data), 2)
 
+    def test_search_by_invalid_title(self):
+        """
+        Test search for a title that is not in the database returns no results
+        """
+        pass
+
+    def test_search_by_invalid_subreddit(self):
+        """
+        Test search for a subreddit that is not in the database returns no results
+        """
+        pass
+
+    def test_search_by_invalid_author(self):
+        """
+        Test search for a title that is not in the database returns no results
+        """
+        pass

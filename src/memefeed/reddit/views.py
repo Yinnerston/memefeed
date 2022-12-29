@@ -1,43 +1,49 @@
 from django.shortcuts import render
 from django.views import generic
+from django.views.generic.edit import FormView
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 
-from .forms import IndexForm
+from .forms import IndexForm, SearchForm
 from .models import Submission
-
-def get_name(request):
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = IndexForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
-
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        form = IndexForm()
-
-    return render(request, 'name.html', {'form': form})
 
 
 class IndexView(generic.ListView):
+    """
+    View for index page.
+    """
     # TODO: Form with search query --> Pass filter in listview
     # Look at django filter by carlton gibsen
     # Add form validation
     # Q Object to do more complex filters
     template_name = "reddit/index.html"
+    form_class = IndexForm
     context_object_name = "top_submissions_list"        
 
     def get_queryset(self):
         """Return the last five published questions."""
         return Submission.objects.order_by("-score", "title")[:5]
 
+class SearchView(FormView):
+    """
+    View that composes the search/query.
+    """
+    template_name = "reddit/search_form.html"
+    form_class = SearchForm
+    success_url = 'search/results'
+
 class SearchResultsView(generic.ListView):
-    template_name = "reddit/search.html"
+    """
+    View that displays the reuslts of a search
+    """
+    template_name = "reddit/results.html"
+    context_object_name = "results_list"
+    model = Submission
+    # paginate_by = 50
 
     def get_queryset(self):
-        return Submission.objects.filter()
+        query = self.request.GET.get('q')
+        subreddit = self.request.GET.get('subreddit')
+        author = self.request.GET.get('author')
+        sort_by = self.request.GET.get('sort_by')
+        return Submission.objects.filter(title__icontains=query)

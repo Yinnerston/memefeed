@@ -1,0 +1,10 @@
+<h1>Results of Search:</h1>
+{% if results_list %}
+    <ul>
+    {% for result in results_list %}
+        <li> {{result.title}} by {{result.author}} on r/{{submission.subreddit}} </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No submissions found by search.</p>
+{% endif %}
