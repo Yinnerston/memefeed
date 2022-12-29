@@ -4,13 +4,9 @@ from django.views.generic.edit import FormView
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from .forms import HeaderForm, SearchForm
+from .forms import SearchForm
 from .models import Submission
 
-def HeaderView(FormView):
-    template_name = "reddit/header.html"
-    form_class = HeaderForm
-    success_url = 'search/results'
 
 class IndexView(generic.ListView):
     """

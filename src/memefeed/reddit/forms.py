@@ -17,9 +17,3 @@ class SearchForm(forms.Form):
     def make_results(self):
         pass
     
-
-class HeaderForm(SearchForm):
-    """
-    Search bar in homepage
-    """
-    template_name = "header.html"

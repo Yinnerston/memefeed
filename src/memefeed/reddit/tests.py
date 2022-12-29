@@ -92,3 +92,5 @@ class SubmissionSearchFormTest(TestCase):
         Test search for a title that is not in the database returns no results
         """
         pass
+
+# TODO: Django views / template testing
