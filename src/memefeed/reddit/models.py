@@ -21,6 +21,9 @@ class Subreddit(models.Model):
     name = models.CharField(primary_key=True, max_length=21)
     favourite = models.BooleanField(default=False)
 
+    def __str__(self) -> str:
+        return self.name
+
 
 class Submission(models.Model):
     """
