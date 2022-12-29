@@ -1,5 +1,6 @@
 """
 Extract daily top reddit submissions for each subreddit in SUBREDDITS_CSV.
+Call this script in the manage.py shell from src/memefeed (/app in docker container)
 """
 import praw
 
@@ -12,9 +13,9 @@ import sentry_sdk
 
 from scripts.etl_utils import *
 from reddit.models import Author, Subreddit, Submission
-from django.db import models, DatabaseError, transaction
+from django.db import DatabaseError, transaction
+from django.core.exceptions import ObjectDoesNotExist
 
-from itertools import zip_longest
 
 class RedditETL:
     """
@@ -141,15 +142,22 @@ class RedditETL:
                                 output_model[k] = map_func(submission, attr_val)
                             else:
                                 output_model[k] = attr_val
-                        # To avoid race condition? TODO: Do i need to save() author, subreddit before submission?
-                        # Convert Dict to django model
+                        # use Try/Except with ObjectDoesNotExist because the 
+                        # Convert output_model Dict to django model
+                        obj = None
                         if model_name == "AUTHOR":
-                            obj, created = Author.objects.get_or_create(**output_model)
+                            try:
+                                obj = Author.objects.get(name=output_model["name"])
+                            except ObjectDoesNotExist:
+                                obj = Author.objects.create(**output_model)
                             foreign_key_dependencies["author"] = {
                                 "submission": obj,  # Primary key of Author used by Submission
                             }
                         elif model_name == "SUBREDDIT":
-                            obj, created = Subreddit.objects.get_or_create(**output_model)
+                            try:
+                                obj = Subreddit.objects.get(name=output_model["name"])
+                            except ObjectDoesNotExist:
+                                obj = Subreddit.objects.create(**output_model)
                             foreign_key_dependencies["subreddit"] = {
                                 "submission": obj,  # Primary key of Subreddit used by Submission
                             }
@@ -160,8 +168,10 @@ class RedditETL:
                             output_model["author"] = foreign_key_dependencies["author"][
                                 "submission"
                             ]
-                            # TODO: Don't save until you've done all validations
-                            obj, created = Submission.objects.get_or_create(**output_model)
+                            try:
+                                obj = Submission.objects.get(id=output_model["id"])
+                            except ObjectDoesNotExist:
+                                obj = Submission.objects.create(**output_model)
                         
         except DatabaseError as e:
             # Expected behaviour for a invalid post is to report , ignore it and add subsequent posts
@@ -199,7 +209,7 @@ class RedditETL:
                     try:
                         # Get top N submissions daily from each subreddit in the list
                         top_submissions = self.reddit.subreddit(subreddit).top(
-                            time_filter="day", limit=5  # TODO: REMOVE THIS
+                            time_filter="day"
                         )
 
                         # {k:v for k, v in submission if k in RedditETL.ACCEPTED_FIELDS}
@@ -210,7 +220,6 @@ class RedditETL:
                     except praw.exceptions.PRAWException as err:
                         # On error, report to Sentry
                         sentry_sdk.capture_exception(err)
-
 
 # Considerations:
 # Failure recovery --> Responses are cached, should I retry until finished?
