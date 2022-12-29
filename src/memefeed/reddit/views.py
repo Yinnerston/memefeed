@@ -4,9 +4,13 @@ from django.views.generic.edit import FormView
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
-from .forms import IndexForm, SearchForm
+from .forms import HeaderForm, SearchForm
 from .models import Submission
 
+def HeaderView(FormView):
+    template_name = "reddit/header.html"
+    form_class = HeaderForm
+    success_url = 'search/results'
 
 class IndexView(generic.ListView):
     """
@@ -17,8 +21,7 @@ class IndexView(generic.ListView):
     # Add form validation
     # Q Object to do more complex filters
     template_name = "reddit/index.html"
-    form_class = IndexForm
-    context_object_name = "top_submissions_list"        
+    context_object_name = "top_submissions_list"
 
     def get_queryset(self):
         """
@@ -43,12 +46,21 @@ class SearchResultsView(generic.ListView):
     model = Submission
     # paginate_by = 50
 
+    def get_context_data(self, **kwargs):
+        """
+        Extra arguments passed to template
+        """
+        context = super(SearchResultsView, self).get_context_data(**kwargs)
+        context['q'] = self.request.GET.get('q')
+        return context
+
     def get_queryset(self):
         """
         Handles generation of results.
         """
         query = self.request.GET.get('q')
+        sort_by = self.request.GET.get('sort_by')
         subreddit = self.request.GET.get('subreddit')
         author = self.request.GET.get('author')
-        sort_by = self.request.GET.get('sort_by')
+
         return Submission.objects.filter(title__icontains=query)

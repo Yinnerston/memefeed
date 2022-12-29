@@ -1,3 +1,5 @@
+{% include "reddit/header.html" %}
+
 <form action={% url 'reddit:search_results' %} method="get">{% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Search">
