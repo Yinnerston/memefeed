@@ -83,7 +83,7 @@ class RedditETL:
         "media": (filter_null_getattr_list, "media"),
         "media_embed": (filter_null_getattr_list, "media_embed"),
         "selftext": (filter_null_getattr_str, "selftext"),
-        "selftext_html": (filter_null_getattr_str, "selftext_html"),
+        "selftext_html": (filter_null_getattr_list_bleach, "selftext_html"),
         "nsfw": (getattr, "over_18"),
         "thumbnail": (getattr, "thumbnail"),
         "secure_media": (filter_null_getattr_list, "secure_media"),

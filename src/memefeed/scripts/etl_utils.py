@@ -5,6 +5,7 @@ Util helpers for reddit_etl.py
 import praw
 import pytz
 from datetime import datetime
+import bleach
 
 # Getattr wrapper functions for author, subreddit foreign key in Submission
 def author_getattr(submission: praw.models.Submission, field_to_get: str) -> str:
@@ -26,3 +27,7 @@ def filter_null_getattr_list(submission: praw.models.Submission, field_to_get: s
 def filter_null_getattr_str(submission: praw.models.Submission, field_to_get: str):
     attr = getattr(submission, field_to_get)
     return attr if attr is not None else ""
+
+def filter_null_getattr_list_bleach(submission: praw.models.Submission, field_to_get: str):
+    attr = bleach.clean(getattr(submission, field_to_get))
+    return attr if attr is not None else {}
