@@ -3,9 +3,11 @@ from django import forms
 from .models import Subreddit
 
 class SearchForm(forms.Form):
-    # Enumerated choices
+    # Enumerated choices in the form of (sort_value, human_readable_value)
     sort_choices = [(0, "relevance"), (1, "score"), (2, "new"), (3, "A-Z")]
-    subreddit_choices = zip(range(Subreddit.objects.count()), Subreddit.objects.all())
+    # TODO: Implement relevance
+    sort_choices_order_by = ["-score", "-score", "created_utc", "title"]
+    subreddit_choices = [(subreddit, subreddit) for subreddit in Subreddit.objects.all()]
 
     # Fields in the form
     template_name = "search_form.html"
@@ -13,7 +15,12 @@ class SearchForm(forms.Form):
     subreddit = forms.MultipleChoiceField(label="r/subreddit", widget=forms.CheckboxSelectMultiple, choices=subreddit_choices, required=False)
     author = forms.CharField(label="u/author", max_length=20, required=False)
     sort_by = forms.ChoiceField(choices=sort_choices, initial="relevance")
-
-    def make_results(self):
-        pass
+    
+    @staticmethod
+    def get_order(sort_value: int):
+        return SearchForm.sort_choices_order_by[sort_value]
+        # try:
+        #     return SearchForm.sort_choices_order_by[int(sort_value)]
+        # except Exception:
+        #     return SearchForm.sort_choices_order_by[0]
     
