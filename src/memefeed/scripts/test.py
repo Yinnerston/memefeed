@@ -3,7 +3,7 @@ Test cases for reddit_etl.py script.
 """
 from django.test import TestCase
 from django.db.models import ForeignKey
-from .reddit_etl import RedditETL, author_getattr, subreddit_getattr
+from .reddit_etl import RedditETL
 from reddit.models import Author, Subreddit, Submission
 import httpretty
 import praw
