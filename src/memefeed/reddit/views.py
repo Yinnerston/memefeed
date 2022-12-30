@@ -25,6 +25,10 @@ class IndexView(generic.ListView):
         """
         return Submission.objects.order_by("-score", "title")[:5]
 
+class ParallelismView(generic.TemplateView):
+    template_name = "reddit/index-parallelism.html"
+
+
 class SearchView(FormView):
     """
     View that composes the search/query.
@@ -56,7 +60,16 @@ class SearchResultsView(generic.ListView):
         """
         query = self.request.GET.get('q')
         sort_by = self.request.GET.get('sort_by')
-        subreddit = self.request.GET.get('subreddit')
-        author = self.request.GET.get('author')
+        order = SearchForm.get_order(sort_by)
+        query = Submission.objects
 
-        return Submission.objects.filter(title__icontains=query)
+        author = self.request.GET.get('author')
+        if author is not None or author != '':
+            # TODO: IS this validation good enought?
+            query = query.filter(author=author)
+        subreddit = self.request.GET.get('subreddit')
+        # TODO:params in url are like: subreddit=0&subreddit=2&subreddit=4&subreddit=5&subreddit=6
+        # And overwrite the preceding one. How to get these as a list?
+            # TODO: Check out how form sends the request and see if i can overwrite it
+            # Maybe look at init, applY(self, request) functions?
+        return Submission.objects.filter(author=author, subreddit=subreddit, title__icontains=query).order_by(order)

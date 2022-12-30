@@ -4,7 +4,7 @@
 {% if results_list %}
     <ul>
     {% for result in results_list %}
-        <li> {{result.title}} by {{result.author}} on r/{{submission.subreddit}} </li>
+        <li> {{result.title}} by {{result.author}} on r/{{result.subreddit}} </li>
     {% endfor %}
     </ul>
 {% else %}
