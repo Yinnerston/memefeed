@@ -5,7 +5,7 @@ Meme image and caption database store and viewer.
 Why make a CRUD app? I have much more to learn in terms of system architecture, performance monitoring, and optimization.
 I've also never implemented a caching server nor have I delved deeply into postgres optimization, so I want to gain some experience with these things whilst picking up Django.
 
-Server is run on localhost port 8008.
+Server is run on localhost port 8000.
 
 # Agile Proposal, Notes & System Architecture
 

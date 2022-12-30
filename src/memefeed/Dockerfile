@@ -11,7 +11,8 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install dependencies
-COPY requirements.txt .
+# copy project
+COPY . .
 RUN apk update && apk add bash
 RUN \
  apk add --no-cache postgresql-libs && \
@@ -19,5 +20,3 @@ RUN \
  python3 -m pip install -r requirements.txt --no-cache-dir && \
  apk --purge del .build-deps
 
-# copy project
-COPY . .
