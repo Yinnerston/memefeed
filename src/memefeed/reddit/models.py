@@ -72,7 +72,9 @@ class SubmissionThumbnailImage(models.Model):
     @property
     def span(self):
         """
-        Get the related span of an image thumbnail for display in article.
+        Get the most closely matching span of an image thumbnail for display in article.
+        Based on image width:height ratio
+        The span is a number between 1 and 3
         """
         span = floor(self.image.width / self.image.height)
-        return max(min(span, 3), 0)
+        return max(min(span, 3), 1)
