@@ -16,14 +16,16 @@ class IndexView(generic.ListView):
     # Look at django filter by carlton gibsen
     # Add form validation
     # Q Object to do more complex filters
-    template_name = "reddit/index.html"
+    template_name = "reddit/index-parallelism.html"
     context_object_name = "top_submissions_list"
 
     def get_queryset(self):
         """
         Return the last five published questions.
         """
-        return Submission.objects.order_by("-score", "title")[:5]
+        top_submissions = Submission.objects.order_by("-score", "title")[:30]
+        return [top_submissions[i::3] for i in range(3)]
+ 
 
 class ParallelismView(generic.TemplateView):
     template_name = "reddit/index-parallelism.html"

@@ -18,11 +18,14 @@
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        <h1>Top 5 Submissions:</h1>
+        
         {% if top_submissions_list %}
+            <h1>Top {{top_submissions_list|length}} Submissions:</h1>
             <ul>
-            {% for submission in top_submissions_list %}
-                <li> {{submission.title}} by {{submission.author}} on r/{{submission.subreddit}} </li>
+            {% for submission_list in top_submissions_list %}
+                {% for submission in submission_list %}
+                    <li> {{submission.title}} by {{submission.author}} ⬆ {{submission.score}} on r/{{submission.subreddit}} </li>
+                {% endfor %}
             {% endfor %}
             </ul>
         {% else %}
