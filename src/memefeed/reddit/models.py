@@ -32,7 +32,7 @@ class Submission(models.Model):
 
     id = models.CharField("Reddit post's ID", max_length=6, primary_key=True)
     title = models.CharField("Title of a Reddit post", max_length=300)
-    score = models.IntegerField("Number of upvotes on a reddit post")
+    score = models.IntegerField("Upvotes")
     url = models.URLField("Submission URL")
     domain = models.CharField("Domain", max_length=50)
     created_utc = models.DateTimeField("Date the submission was created")

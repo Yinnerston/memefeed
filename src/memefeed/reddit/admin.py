@@ -15,6 +15,6 @@ class SubredditAdmin(admin.ModelAdmin):
 
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'subreddit', 'author', 'score', 'url')
+    list_display = ('id', 'title', 'subreddit', 'author', 'score', 'url', 'created_utc')
     search_fields = ['title', 'subreddit__name', 'author__name']
 
