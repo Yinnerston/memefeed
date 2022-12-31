@@ -256,12 +256,15 @@ class RedditETLTest(TestCase):
         """
         Given a valid input from Reddit.top_submissions, correctly
         """
-        submissions_list = self.instance.reddit.subreddit("funny").top(
-            limit=1, time_filter="day"
-        )
-        transformed = self.instance._transform_top_submissions(submissions_list)
-        self.assertEquals(Author.objects.count(), 1)
+        ids = [
+            "t3_zvn17h",
+            "t3_zvms2j",
+            "t3_zvmrlj",
+        ]
+        test_data = self.instance.reddit.info(ids)
+        transformed = self.instance._transform_top_submissions(test_data)
+        self.assertEquals(Author.objects.count(), 2)
         self.assertEquals(Subreddit.objects.count(), 1)
-        self.assertEquals(Subreddit.objects.count(), 1)
+        self.assertEquals(Submission.objects.count(), 3)
 
         
