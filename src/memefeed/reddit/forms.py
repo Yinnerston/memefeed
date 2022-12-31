@@ -18,9 +18,8 @@ class SearchForm(forms.Form):
     
     @staticmethod
     def get_order(sort_value: int):
-        return SearchForm.sort_choices_order_by[sort_value]
-        # try:
-        #     return SearchForm.sort_choices_order_by[int(sort_value)]
-        # except Exception:
-        #     return SearchForm.sort_choices_order_by[0]
+        try:
+            return SearchForm.sort_choices_order_by[int(sort_value)]
+        except Exception:
+            return SearchForm.sort_choices_order_by[0]
     

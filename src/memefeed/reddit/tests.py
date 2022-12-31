@@ -16,7 +16,10 @@ class SubredditTest(TestCase):
 class SubmissionTest(TestCase):
     pass
 
-class SubmissionSearchFormTest(TestCase):
+class SearchFormTest(TestCase):
+    """
+    Test for the SearchForm
+    """
     @classmethod
     def setUpTestData(cls):
         # Setup etl for whole class
@@ -31,9 +34,10 @@ class SubmissionSearchFormTest(TestCase):
             "t3_vj1p48",
             "t3_sphocx",
         ]
-        test_data = cls.instance.reddit.info(ids)
+        test_data = cls.instance.reddit.info(cls.ids)
         cls.instance._transform_top_submissions(test_data)
 
+    # Tests for Title
     def test_search_exact_title_match(self):
         """
         Test search by exact title returns a result
@@ -49,6 +53,29 @@ class SubmissionSearchFormTest(TestCase):
             response, "No submissions found", html=True
         )
 
+    def test_title_empty_query_string_returns_all_results(self):
+        """
+        Test empty query string returns all results.
+        """
+        response = self.client.get("/reddit/search/results", data={
+            "q": "",
+            "sort_by": 0,
+        })
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertNotContains(
+            response, "No submissions found", html=True
+        )
+        # Check all submissions are present
+        results_list =  response.context['results_list']
+        self.assertEqual(len(results_list), len(self.ids))
+
+    def test_search_by_invalid_title(self):
+        """
+        Test search for a title that is not in the database returns no results
+        """
+        pass
+
+    # Test search with filter by subreddit
     def test_search_filter_by_subreddit(self):
         """
         Test search by specific subreddit
@@ -68,6 +95,12 @@ class SubmissionSearchFormTest(TestCase):
         self.assertEqual(len(results_list), 3)
         for result in results_list:
             self.assertEquals(result.subreddit.name, "test_memefeed")
+    
+    def test_search_by_invalid_subreddit(self):
+        """
+        Test search for a subreddit that is not in the database returns no results
+        """
+        pass
 
     def test_search_filter_by_author(self):
         """
@@ -89,22 +122,13 @@ class SubmissionSearchFormTest(TestCase):
         for result in results_list:
             self.assertEquals(result.author.name, "YinnerstonMemefeed")
 
-    def test_empty_query_string_returns_all_results(self):
+    def test_search_by_invalid_author(self):
         """
-        Test empty query string returns all results.
+        Test search for a title that is not in the database returns no results
         """
-        response = self.client.get("/reddit/search/results", data={
-            "q": "",
-            "sort_by": 0,
-        })
-        self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertNotContains(
-            response, "No submissions found", html=True
-        )
-        # Check all submissions are present
-        results_list =  response.context['results_list']
-        self.assertEqual(len(results_list), len(self.ids))
+        pass
 
+    # Test Sort
     def test_sort_by_relevance(self):
         pass
 
@@ -117,23 +141,7 @@ class SubmissionSearchFormTest(TestCase):
     def test_sort_by_alphabetical(self):
         pass
 
-    def test_search_by_invalid_title(self):
-        """
-        Test search for a title that is not in the database returns no results
-        """
-        pass
 
-    def test_search_by_invalid_subreddit(self):
-        """
-        Test search for a subreddit that is not in the database returns no results
-        """
-        pass
-
-    def test_search_by_invalid_author(self):
-        """
-        Test search for a title that is not in the database returns no results
-        """
-        pass
 
 
 # TODO: Django views / template testing
