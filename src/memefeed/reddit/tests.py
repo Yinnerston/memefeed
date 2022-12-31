@@ -47,6 +47,18 @@ class IndexViewTest(TestCase):
         # TODO: Write test for full image after implementation
         pass
 
+    def test_thumbnail_nsfw_ireddit_jpg_png(self):
+        pass
+
+    def test_thumbnail_nsfw_ireddit_gif(self):
+        pass
+
+    def test_thumbnail_nsfw_ireddit_gif(self):
+        pass
+
+    def test_thumbnail_nsfw_vreddit_video(self):
+        pass
+
     def test_thumbnail_span_ratio_jpg_png(self):
         # TODO: Future Sprint
         pass
@@ -69,6 +81,18 @@ class IndexViewTest(TestCase):
         pass
 
     def test_full_image_imgur(self):
+        pass
+
+    def test_full_image_nsfw_ireddit_jpg_png(self):
+        pass
+
+    def test_full_image_nsfw_ireddit_gif(self):
+        pass
+
+    def test_full_image_nsfw_ireddit_gif(self):
+        pass
+
+    def test_full_image_nsfw_vreddit_video(self):
         pass
 
 
