@@ -29,5 +29,7 @@ def filter_null_getattr_str(submission: praw.models.Submission, field_to_get: st
     return attr if attr is not None else ""
 
 def filter_null_getattr_list_bleach(submission: praw.models.Submission, field_to_get: str):
-    attr = bleach.clean(getattr(submission, field_to_get))
+    attr = getattr(submission, field_to_get)
+    if attr is not None:
+        attr = bleach.clean(attr)
     return attr if attr is not None else {}
