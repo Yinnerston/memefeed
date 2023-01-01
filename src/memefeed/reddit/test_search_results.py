@@ -49,7 +49,7 @@ class SearchFormTest(TestCase):
         })
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotContains(
-            response, "No submissions found", html=True
+            response, "No submissions found"
         )
 
     def test_title_empty_query_string_returns_all_results(self):
@@ -62,7 +62,7 @@ class SearchFormTest(TestCase):
         })
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotContains(
-            response, "No submissions found", html=True
+            response, "No submissions found"
         )
         # Check all submissions are present
         results_list =  self.flatten_results_list(response.context['results_list'])
@@ -78,7 +78,7 @@ class SearchFormTest(TestCase):
         })
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertContains(
-            response, "No submissions found", html=True
+            response, "No submissions found"
         )
         results_list =  self.flatten_results_list(response.context['results_list'])
         self.assertEqual(len(results_list), 0)
@@ -96,7 +96,7 @@ class SearchFormTest(TestCase):
         })
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotContains(
-            response, "No submissions found", html=True
+            response, "No submissions found"
         )
         # Check all submissions are part of test_memefeed
         results_list =  self.flatten_results_list(response.context['results_list'])
@@ -115,7 +115,7 @@ class SearchFormTest(TestCase):
         })
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertContains(
-            response, "No submissions found", html=True
+            response, "No submissions found"
         )
         # Check all submissions are part of test_memefeed
         results_list =  self.flatten_results_list(response.context['results_list'])
@@ -133,7 +133,7 @@ class SearchFormTest(TestCase):
         })
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotContains(
-            response, "No submissions found", html=True
+            response, "No submissions found"
         )
         # Check all submissions are part of test_memefeed
         results_list =  self.flatten_results_list(response.context['results_list'])
@@ -152,7 +152,7 @@ class SearchFormTest(TestCase):
         })
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertContains(
-            response, "No submissions found", html=True
+            response, "No submissions found"
         )
         # Check all submissions are part of test_memefeed
         results_list =  self.flatten_results_list(response.context['results_list'])
@@ -173,7 +173,7 @@ class SearchFormTest(TestCase):
         })
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotContains(
-            response, "No submissions found", html=True
+            response, "No submissions found"
         )
         # Check that submissions are descending by score
         results_list =  self.flatten_results_list(response.context['results_list'])
@@ -194,7 +194,7 @@ class SearchFormTest(TestCase):
         })
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotContains(
-            response, "No submissions found", html=True
+            response, "No submissions found"
         )
         # Check that submissions are descending by created_utc
         results_list =  self.flatten_results_list(response.context['results_list'])
@@ -215,7 +215,7 @@ class SearchFormTest(TestCase):
         })
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotContains(
-            response, "No submissions found", html=True
+            response, "No submissions found"
         )
         # Check that submissions are descending by score
         results_list =  self.flatten_results_list(response.context['results_list'])

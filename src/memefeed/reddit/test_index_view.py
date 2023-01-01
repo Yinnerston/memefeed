@@ -53,7 +53,7 @@ class IndexViewTest(TestCase):
         # Check that the url can be opened
         self.assertEquals(urllib.request.urlopen(index_jpg_submission.url).getcode(), HTTPStatus.OK)
         # Check that that the jpg has been rendered
-        self.assertContains(response, jpg_submission.title, html=True)
+        self.assertContains(response, jpg_submission.title)
 
     def test_thumbnaill_ireddit_png(self):
         """
@@ -69,7 +69,7 @@ class IndexViewTest(TestCase):
         # Check that the url can be opened
         self.assertEquals(urllib.request.urlopen(index_png_submission.url).getcode(), HTTPStatus.OK)
         # Check that that the png has been rendered
-        self.assertContains(response, png_submission.title, html=True)
+        self.assertContains(response, png_submission.title)
 
 
     def test_thumbnail_ireddit_gif(self):
@@ -87,7 +87,7 @@ class IndexViewTest(TestCase):
         # Check that the url can be opened
         self.assertEquals(urllib.request.urlopen(index_gif_submission.url).getcode(), HTTPStatus.OK)
         # Check that that the png has been rendered
-        self.assertContains(response, gif_submission.title, html=True)
+        self.assertContains(response, gif_submission.title)
 
     def test_thumbnail_ireddit_selftext(self):
         pass
@@ -110,14 +110,14 @@ class IndexViewTest(TestCase):
         response = self.client.get("/reddit/", data={})
         self.assertEquals(response.status_code, HTTPStatus.OK)
 
-        self.assertNotContains(response, "No submissions found", html=True)
+        self.assertNotContains(response, "No submissions found")
         self.assertNotEqual(response.context["top_submissions_list"], [])
         index_imgur_submission = response.context["top_submissions_list"][0][0]
         self.assertEquals(imgur_submission, index_imgur_submission)
         # Check that the url can be opened
         self.assertEquals(urllib.request.urlopen(index_imgur_submission.url).getcode(), HTTPStatus.OK)
         # Check that that the png has been rendered
-        self.assertContains(response, imgur_submission.title, html=True)
+        self.assertContains(response, imgur_submission.title)
 
     def test_thumbnail_misc(self):
         # TODO: Write test for full image after implementation
@@ -141,7 +141,7 @@ class IndexViewTest(TestCase):
         # Check that the url can be opened
         self.assertEquals(urllib.request.urlopen(index_nsfw_submission.url).getcode(), HTTPStatus.OK)
         # Check that that the png has been rendered
-        self.assertContains(response, nsfw_submission.title, html=True)
+        self.assertContains(response, nsfw_submission.title)
 
     def test_thumbnail_span_ratio_jpg_png(self):
         # TODO: Future Sprint
