@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.db.models import Q
 
 from .forms import SearchForm
-from .models import Submission
+from .models import Submission, Subreddit
 
 
 class IndexView(generic.ListView):
@@ -88,3 +88,44 @@ class SearchResultsView(generic.ListView):
             # TODO: Check out how form sends the request and see if i can overwrite it
             # Maybe look at init, applY(self, request) functions?
         return query.order_by(order).all()
+
+class SubredditView(IndexView):
+    template_name = "reddit/subreddit.html"
+    context_object_name = "top_submissions_list"
+    paginate_by = 3        
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        _subreddit_name = kwargs.get("subreddit_name", None)
+        try:
+            self.subreddit = Subreddit.objects.get(name=_subreddit_name)
+            self.subreddit_not_found = False
+        except:
+            self.subreddit = None
+            self.subreddit_not_found = True
+
+
+    def get_context_data(self, **kwargs):
+        """
+        Extra arguments passed to template
+        """
+        context = super(SubredditView, self).get_context_data(**kwargs)
+        context['subreddit'] = self.subreddit
+        context['subreddit_not_found'] = self.subreddit_not_found
+        return context
+
+    def get_queryset(self):
+        """
+        Returns the top submissions by score in descending order.
+        Submissions are grouped into sub-lists of length = items_len
+        """
+        # Variable for how many submissions are displayed in a row in the index
+        items_len = 20
+        # TODO: Future sprint, implement video, galleries
+        #  | Q(domain="v.redd.it")
+        if not self.subreddit_not_found:
+            subreddit_name = self.subreddit
+            top_submissions = Submission.objects.filter(subreddit=subreddit_name).filter(Q(domain__icontains="imgur.com") | Q(domain="i.redd.it")).order_by("-score", "title")
+            return [top_submissions[i:i+items_len] for i in range(0, len(top_submissions), items_len)]
+        else:
+            return []

@@ -1,0 +1,80 @@
+{% load static %}
+{% load reddit_filter %}
+<!DOCTYPE HTML>
+<!--
+	Parallelism by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>{% block title %}{% endblock %}</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="{% static 'reddit/assets/css/main.css' %}" />
+		<noscript><link rel="stylesheet" href="{% static 'reddit/assets/css/noscript.css' %}" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+				<!-- Header -->
+					<section id="header">
+						{% include "reddit/header.html" %}
+                        {%block page_name %}{% endblock %}
+					</section>
+			<!-- Main -->
+					<section id="main">
+
+						<!-- Items -->
+                        {% block content %}
+                        {% endblock %}
+
+						
+					</section>
+
+				<!-- Footer -->
+					<section id="footer">
+						<section>
+							<div class="pagination">
+								<span class="step-links">
+									{% if page_obj.has_previous %}
+										<a href="?page=1">&laquo; first</a>
+										<a href="?page={{ page_obj.previous_page_number }}">previous</a>
+									{% endif %}
+							
+									<span class="current">
+										Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+									</span>
+							
+									{% if page_obj.has_next %}
+										<a href="?page={{ page_obj.next_page_number }}">next</a>
+										<a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+									{% endif %}
+								</span>
+							</div>
+						</section>
+						<section>
+							<ul class="icons">
+								<li><a href="https://github.com/Yinnerston/memefeed" class="icon brands fa-github"><span class="label">Github</span></a></li>
+								<li><a href="https://www.reddit.com/user/YinnerstonMemefeed" class="icon brands fa-reddit"><span class="label">Reddit</span></a></li>
+								<li><a href="mailto:YinnerstonMemefeed@gmail.com" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+							</ul>
+							<ul class="copyright">
+								<li><a href="https://github.com/Yinnerston/memefeed">Yinnerston Memefeed</a></li><li>Template from: <a href="http://html5up.net">HTML5 UP</a></li>
+							</ul>
+						</section>
+					</section>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="{% static 'reddit/assets/js/jquery.min.js' %}"></script>
+			<script src="{% static 'reddit/assets/js/jquery.poptrox.min.js' %}"></script>
+			<script src="{% static 'reddit/assets/js/browser.min.js' %}"></script>
+			<script src="{% static 'reddit/assets/js/breakpoints.min.js' %}"></script>
+			<script src="{% static 'reddit/assets/js/util.js' %}"></script>
+			<script src="{% static 'reddit/assets/js/main.js' %}"></script>
+
+	</body>
+</html>

@@ -1,12 +1,16 @@
-{% extends "reddit/base.html" %}
+{% extends "reddit/index.html" %}
 {% load reddit_filter %}
+
 
 {% block title %}Memefeed By Yinnerston{% endblock %}
 
 {%block page_name %}
-    <h2>Index Page</h2>
+    {% if subreddit_not_found %}
+        <h2>Invalid subreddit name!</h2>
+    {% elif subreddit %}
+        <h2>Posts from r/{{subreddit.name}}</h2>
+    {% endif %}
 {% endblock %}
-
 
 {% block content %}
 	{% if page_obj %}
