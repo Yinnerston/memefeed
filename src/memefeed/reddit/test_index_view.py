@@ -5,11 +5,13 @@ Test IndexView and index.html template
 from django.test import TestCase, LiveServerTestCase
 from django.urls import reverse
 from scripts.reddit_etl import RedditETL
+
 # from reddit.forms import SearchForm
 from reddit.models import Author, Subreddit, Submission
 from http import HTTPStatus
 import sentry_sdk
 import urllib
+
 
 class IndexViewTest(TestCase):
     @classmethod
@@ -28,7 +30,7 @@ class IndexViewTest(TestCase):
         # ]
         # test_data = cls.instance.reddit.info(fullnames=cls.ids)
         # cls.instance._transform_top_submissions(test_data)
-    
+
     def load_submission(self, id):
         """
         Load a single submission id=id into test database.
@@ -38,7 +40,7 @@ class IndexViewTest(TestCase):
         self.assertIsNotNone(submission)
         return IndexViewTest.instance._load_submission(submission)
 
-    # Tests for image thumbnail    
+    # Tests for image thumbnail
     def test_thumbnail_ireddit_jpg(self):
         """
         Test thumbnail correctly takes jpg data from reddit
@@ -51,7 +53,9 @@ class IndexViewTest(TestCase):
         index_jpg_submission = response.context["top_submissions_list"][0][0]
         self.assertEquals(jpg_submission, index_jpg_submission)
         # Check that the url can be opened
-        self.assertEquals(urllib.request.urlopen(index_jpg_submission.url).getcode(), HTTPStatus.OK)
+        self.assertEquals(
+            urllib.request.urlopen(index_jpg_submission.url).getcode(), HTTPStatus.OK
+        )
         # Check that that the jpg has been rendered
         self.assertContains(response, jpg_submission.title)
 
@@ -67,10 +71,11 @@ class IndexViewTest(TestCase):
         index_png_submission = response.context["top_submissions_list"][0][0]
         self.assertEquals(png_submission, index_png_submission)
         # Check that the url can be opened
-        self.assertEquals(urllib.request.urlopen(index_png_submission.url).getcode(), HTTPStatus.OK)
+        self.assertEquals(
+            urllib.request.urlopen(index_png_submission.url).getcode(), HTTPStatus.OK
+        )
         # Check that that the png has been rendered
         self.assertContains(response, png_submission.title)
-
 
     def test_thumbnail_ireddit_gif(self):
         """
@@ -85,7 +90,9 @@ class IndexViewTest(TestCase):
         index_gif_submission = response.context["top_submissions_list"][0][0]
         self.assertEquals(gif_submission, index_gif_submission)
         # Check that the url can be opened
-        self.assertEquals(urllib.request.urlopen(index_gif_submission.url).getcode(), HTTPStatus.OK)
+        self.assertEquals(
+            urllib.request.urlopen(index_gif_submission.url).getcode(), HTTPStatus.OK
+        )
         # Check that that the png has been rendered
         self.assertContains(response, gif_submission.title)
 
@@ -95,7 +102,7 @@ class IndexViewTest(TestCase):
     # TODO: Different video formats (?)
     def test_thumbnail_vreddit_video(self):
         pass
-    
+
     def test_thumbnail_reddit_gallery(self):
         # TODO: Write test for full image after implementation
         pass
@@ -115,7 +122,9 @@ class IndexViewTest(TestCase):
         index_imgur_submission = response.context["top_submissions_list"][0][0]
         self.assertEquals(imgur_submission, index_imgur_submission)
         # Check that the url can be opened
-        self.assertEquals(urllib.request.urlopen(index_imgur_submission.url).getcode(), HTTPStatus.OK)
+        self.assertEquals(
+            urllib.request.urlopen(index_imgur_submission.url).getcode(), HTTPStatus.OK
+        )
         # Check that that the png has been rendered
         self.assertContains(response, imgur_submission.title)
 
@@ -139,7 +148,9 @@ class IndexViewTest(TestCase):
         index_nsfw_submission = response.context["top_submissions_list"][0][0]
         self.assertEquals(nsfw_submission, index_nsfw_submission)
         # Check that the url can be opened
-        self.assertEquals(urllib.request.urlopen(index_nsfw_submission.url).getcode(), HTTPStatus.OK)
+        self.assertEquals(
+            urllib.request.urlopen(index_nsfw_submission.url).getcode(), HTTPStatus.OK
+        )
         # Check that that the png has been rendered
         self.assertContains(response, nsfw_submission.title)
 
@@ -160,7 +171,7 @@ def IndexViewSeleniumTest(LiveServerTestCase):
     def test_full_image_ireddit_jpg_png(self):
         jpg_submission = self.load_submission("zzycfr")
         png_submission = self.load_submission("zzydk5")
-        # Get full screen of 
+        # Get full screen of
         response = self.client.get("/reddit/", data={})
 
     def test_full_image_ireddit_gif(self):
@@ -180,7 +191,6 @@ def IndexViewSeleniumTest(LiveServerTestCase):
     # Covers nsfw data for full image
     def test_full_image_nsfw_ireddit_jpg_png(self):
         pass
-
 
     # Tests for pagination
     def test_pagination_submission_count(self):

@@ -1,9 +1,12 @@
+{% load static %}
+
 <div class="headernav">
+    <link rel="stylesheet" href="{% static 'reddit/assets/css/header.css' %}">
     {% url 'reddit:index' as index_url %}
     {% url 'reddit:compose_search' as compose_search_url %}
     {% comment %} {% url 'reddit:search_results' as results_url %} {% endcomment %}
 
-    <a href="{{ index_url }}">Memefeed</a>
+    <a href="{{ index_url }}"><h1 id="header_index_h1">Memefeed</h1></a>
     {% comment %} <form action="{{ results_url }}" method="get">{% csrf_token %}
         {{ form.q }}
         {{ form.sort_by }}

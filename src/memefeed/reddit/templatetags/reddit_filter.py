@@ -2,9 +2,11 @@ from django import template
 from django.utils.html import conditional_escape, escape
 from django.utils.safestring import mark_safe
 import sentry_sdk
+
 register = template.Library()
 
-@register.filter(name='display_media', needs_autoescape=True)
+
+@register.filter(name="display_media", needs_autoescape=True)
 def display_media(submission, autoescape=True):
     # Define escape function for arguments
     if autoescape:
@@ -38,4 +40,3 @@ def display_media(submission, autoescape=True):
         sentry_sdk.capture_exception(e)
 
     return mark_safe(article)
-

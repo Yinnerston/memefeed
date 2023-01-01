@@ -98,10 +98,14 @@ class RedditETL:
         "SUBMISSION": SUBMISSION_MAP,
     }
 
-
     def __init__(self, subreddits_csv="scripts/data/subreddits.csv", testing=False):
         if not testing:
-            logging.basicConfig(filename='reddit_etl.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s')
+            logging.basicConfig(
+                filename="reddit_etl.log",
+                encoding="utf-8",
+                level=logging.DEBUG,
+                format="%(asctime)s %(message)s",
+            )
 
         # Auth information is contained in praw.ini file. See setup.md
         self.reddit = praw.Reddit("memefeedbot")
@@ -138,54 +142,53 @@ class RedditETL:
         try:
             # Each Reddit post --> (Author, Subreddit, Submission) is atomic
             with transaction.atomic():
-                for model_name, model in RedditETL.MODEL_MAPPINGS.items():                
-                        # Convert submission to the corresponding dict for django model **kwargs
-                        output_model = {}
-                        for k, v in model.items():
-                            map_func, attr_val = v
-                            if map_func is not None:
-                                output_model[k] = map_func(submission, attr_val)
-                            else:
-                                output_model[k] = attr_val
-                        # use Try/Except with ObjectDoesNotExist because to avoid IntegrityError from unsanitized input
-                        # Only the first iteration of a post is saved. Subsequent runs do not insert / update
-                        # Convert output_model Dict to django model
-                        obj = None
-                        if model_name == "AUTHOR":
-                            try:
-                                obj = Author.objects.get(name=output_model["name"])
-                            except ObjectDoesNotExist:
-                                obj = Author.objects.create(**output_model)
-                                if obj:
-                                    created_author = True
-                            foreign_key_dependencies["author"] = {
-                                "submission": obj,  # Primary key of Author used by Submission
-                            }
-                        elif model_name == "SUBREDDIT":
-                            try:
-                                obj = Subreddit.objects.get(name=output_model["name"])
-                            except ObjectDoesNotExist:
-                                obj = Subreddit.objects.create(**output_model)
-                                if obj:
-                                    created_subreddit = True
-                            foreign_key_dependencies["subreddit"] = {
-                                "submission": obj,  # Primary key of Subreddit used by Submission
-                            }
-                        elif model_name == "SUBMISSION":
-                            output_model["subreddit"] = foreign_key_dependencies["subreddit"][
-                                "submission"
-                            ]
-                            output_model["author"] = foreign_key_dependencies["author"][
-                                "submission"
-                            ]
-                            try:
-                                obj = Submission.objects.get(id=output_model["id"])
-                            except ObjectDoesNotExist:
-                                obj = Submission.objects.create(**output_model)
-                                if obj:
-                                    created_submission = True
+                for model_name, model in RedditETL.MODEL_MAPPINGS.items():
+                    # Convert submission to the corresponding dict for django model **kwargs
+                    output_model = {}
+                    for k, v in model.items():
+                        map_func, attr_val = v
+                        if map_func is not None:
+                            output_model[k] = map_func(submission, attr_val)
+                        else:
+                            output_model[k] = attr_val
+                    # use Try/Except with ObjectDoesNotExist because to avoid IntegrityError from unsanitized input
+                    # Only the first iteration of a post is saved. Subsequent runs do not insert / update
+                    # Convert output_model Dict to django model
+                    obj = None
+                    if model_name == "AUTHOR":
+                        try:
+                            obj = Author.objects.get(name=output_model["name"])
+                        except ObjectDoesNotExist:
+                            obj = Author.objects.create(**output_model)
+                            if obj:
+                                created_author = True
+                        foreign_key_dependencies["author"] = {
+                            "submission": obj,  # Primary key of Author used by Submission
+                        }
+                    elif model_name == "SUBREDDIT":
+                        try:
+                            obj = Subreddit.objects.get(name=output_model["name"])
+                        except ObjectDoesNotExist:
+                            obj = Subreddit.objects.create(**output_model)
+                            if obj:
+                                created_subreddit = True
+                        foreign_key_dependencies["subreddit"] = {
+                            "submission": obj,  # Primary key of Subreddit used by Submission
+                        }
+                    elif model_name == "SUBMISSION":
+                        output_model["subreddit"] = foreign_key_dependencies[
+                            "subreddit"
+                        ]["submission"]
+                        output_model["author"] = foreign_key_dependencies["author"][
+                            "submission"
+                        ]
+                        try:
+                            obj = Submission.objects.get(id=output_model["id"])
+                        except ObjectDoesNotExist:
+                            obj = Submission.objects.create(**output_model)
+                            if obj:
+                                created_submission = True
 
-                        
         except DatabaseError as e:
             # Expected behaviour for a invalid post is to report , ignore it and add subsequent posts
             sentry_sdk.capture_exception(e)
@@ -197,9 +200,14 @@ class RedditETL:
             logging.error("Exception:", e)
         else:
             if created_author:
-                logging.info("Added Author: %s", foreign_key_dependencies["author"]["submission"])
+                logging.info(
+                    "Added Author: %s", foreign_key_dependencies["author"]["submission"]
+                )
             if created_subreddit:
-                logging.info("Added Subreddit: %s", foreign_key_dependencies["subreddit"]["submission"])
+                logging.info(
+                    "Added Subreddit: %s",
+                    foreign_key_dependencies["subreddit"]["submission"],
+                )
             if created_submission:
                 logging.info("Added Submission: %s", obj)
         return obj
@@ -218,7 +226,7 @@ class RedditETL:
         """
         Extracts the top N_submissionS_PER_SUBREDDIT from each subreddit in SUBREDDITS_CSV
         """
-        
+
         with open(self.SUBREDDITS_CSV, newline="") as subreddits_csv:
             subreddit_reader = reader(subreddits_csv)
             for row in subreddit_reader:
@@ -237,13 +245,12 @@ class RedditETL:
                         )
 
                         # {k:v for k, v in submission if k in RedditETL.ACCEPTED_FIELDS}
-                        self._transform_top_submissions(
-                            top_submissions
-                        )
+                        self._transform_top_submissions(top_submissions)
                         # transformed_submissions = [submission for submission in top_submissions]
                     except praw.exceptions.PRAWException as err:
                         # On error, report to Sentry
                         sentry_sdk.capture_exception(err)
+
 
 # Considerations:
 # Failure recovery --> Responses are cached, should I retry until finished?

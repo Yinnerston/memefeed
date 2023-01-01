@@ -9,6 +9,7 @@ import httpretty
 import praw
 import sentry_sdk
 
+
 class RedditETLTest(TestCase):
     """
     Testing ETL process
@@ -22,7 +23,6 @@ class RedditETLTest(TestCase):
         self.instance = RedditETL()
         # Disable sending error messages to sentry whilst testing
         sentry_sdk.init(dsn="")
-        
 
     def get_example_submission(self):
         """
@@ -63,11 +63,11 @@ class RedditETLTest(TestCase):
         # Check that the fields are correct
         self.assertEqual(saved_author.name, loaded_submission.author.name)
         self.assertEqual(saved_subreddit.name, submission.subreddit.display_name)
-        # Not iterating over fields because possiblility of post being edited 
+        # Not iterating over fields because possiblility of post being edited
         # + data format (default values) changing over time
         self.assertEquals(submission.title, saved_submission.title)
         # TODO: Test fields that undergo transformation in reddit_etl
-        
+
         # for field in Submission._meta.get_fields():
         #     field_name = field.name
         #     field_value = getattr(saved_submission, field_name)
@@ -147,9 +147,7 @@ class RedditETLTest(TestCase):
         # Check there are two distinct authors
         self.assertTrue(Author.objects.get(name=submission.author))
         self.assertTrue(
-            Author.objects.get(
-                name=different_author_same_subreddit_submission.author
-            )
+            Author.objects.get(name=different_author_same_subreddit_submission.author)
         )
         self.assertEquals(Author.objects.count(), 2)
         # Check there's only one subreddit saved
@@ -174,7 +172,7 @@ class RedditETLTest(TestCase):
         self.assertEquals(Subreddit.objects.count(), 1)
         self.assertTrue(Submission.objects.get(id=submission.id))
         self.assertEquals(Subreddit.objects.count(), 1)
-    
+
     def test_duplicate_pk_different_attribute_values(self):
         """
         Test no error is produced on insertion of duplicate pk, with changed value(s).
@@ -213,7 +211,6 @@ class RedditETLTest(TestCase):
         # TODO:
         pass
 
-
     def test_load_submission_invalid_map_func_atomic_commit(self):
         """
         Test that loading invalid models doesn't work.
@@ -232,10 +229,9 @@ class RedditETLTest(TestCase):
             def __str__(self) -> str:
                 return self.invalid_attr
 
-        
         post = self.get_example_submission()
-        
-        # Expected behaviour is 
+
+        # Expected behaviour is
         invalid_obj = InvalidSubmission("invalid_attr")
         try:
             self.instance._load_submission(invalid_obj)
@@ -266,5 +262,3 @@ class RedditETLTest(TestCase):
         self.assertEquals(Author.objects.count(), 2)
         self.assertEquals(Subreddit.objects.count(), 1)
         self.assertEquals(Submission.objects.count(), 3)
-
-        

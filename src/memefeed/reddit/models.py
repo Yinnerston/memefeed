@@ -1,6 +1,7 @@
 from django.db import models
 from math import floor
 
+
 class Author(models.Model):
     """
     Author of a submission.
@@ -53,22 +54,26 @@ class Submission(models.Model):
     subreddit = models.ForeignKey(Subreddit, models.CASCADE)
     author = models.ForeignKey(Author, models.CASCADE)
 
+
 class SubmissionFullImage(models.Model):
     """
     Full image relating to a submission.
     """
+
     submission = models.ForeignKey(Submission, models.CASCADE)
     image = models.ImageField(upload_to="submissions/full")
     image_ext = models.CharField("Image Extension E.G. jpg, png, gif", max_length=10)
+
 
 class SubmissionThumbnailImage(models.Model):
     """
     Thumbnail image relating to a submission.
     """
+
     submission = models.ForeignKey(Submission, models.CASCADE)
     image = models.ImageField(upload_to="submissions/thumbs")
     image_ext = models.CharField("Image Extension E.G. jpg, png, gif", max_length=10)
-    
+
     @property
     def span(self):
         """
