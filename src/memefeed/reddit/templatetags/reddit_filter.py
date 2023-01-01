@@ -26,6 +26,7 @@ def display_media(submission, autoescape=True):
             pass
             # TODO: Exception on crosspost because keyerror
             # TODO: Video not implemented
+            # TODO: See https://github.com/ajlkn/jquery.poptrox#supported-types
             # tmp_url = esc(submission.media["reddit_video"]["fallback_url"])
             # article = f'<a href="{tmp_url}" class="image"><img src="{tmp_url}" alt="" id="{submission.id}"></a>'
             # article = f'<a href="{tmp_url}" class="image"><video poster="{{% static \'reddit/images/thumbs/placeholder.jpg\' %}}" id="{submission.id}"><source src="{tmp_url}" type="video/mp4"></video></a>'
