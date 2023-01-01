@@ -3,6 +3,7 @@ from django.views import generic
 from django.views.generic.edit import FormView
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.db.models import Q
 
 from .forms import SearchForm
 from .models import Submission
@@ -16,19 +17,23 @@ class IndexView(generic.ListView):
     # Look at django filter by carlton gibsen
     # Add form validation
     # Q Object to do more complex filters
-    template_name = "reddit/index-parallelism.html"
+    template_name = "reddit/index.html"
     context_object_name = "top_submissions_list"
+    paginate_by = 3
+    
 
     def get_queryset(self):
         """
-        Return the last five published questions.
+        Returns the top submissions by score in descending order.
+        Submissions are grouped into sub-lists of length = items_len
         """
-        top_submissions = Submission.objects.order_by("-score", "title")[:30]
-        return [top_submissions[i::3] for i in range(3)]
+        # Variable for how many submissions are displayed in a row in the index
+        items_len = 20
+        # TODO: Future sprint, implement video, galleries
+        #  | Q(domain="v.redd.it")
+        top_submissions = Submission.objects.filter(Q(domain="i.imgur.com") | Q(domain="i.redd.it")).order_by("-score", "title")
+        return [top_submissions[i:i+items_len] for i in range(0, len(top_submissions), items_len)]
  
-
-class ParallelismView(generic.TemplateView):
-    template_name = "reddit/index-parallelism.html"
 
 
 class SearchView(FormView):
@@ -46,7 +51,7 @@ class SearchResultsView(generic.ListView):
     template_name = "reddit/results.html"
     context_object_name = "results_list"
     model = Submission
-    # paginate_by = 50
+    # paginate_by = 60
 
     def get_context_data(self, **kwargs):
         """
@@ -60,18 +65,26 @@ class SearchResultsView(generic.ListView):
         """
         Handles generation of results.
         """
-        query = self.request.GET.get('q')
+        title = self.request.GET.get('q')
         sort_by = self.request.GET.get('sort_by')
         order = SearchForm.get_order(sort_by)
-        query = Submission.objects
+        query = Submission.objects.filter(Q(domain="i.redd.it") | Q(domain="v.redd.it") | Q(domain="i.imgur.com"))
+        if query is not None and query != "":
+            # Get specific title
+            query = query.filter(title__icontains=title)
+        elif query == "":
+            # Accept any title
+            pass
 
         author = self.request.GET.get('author')
         if author is not None or author != '':
             # TODO: IS this validation good enought?
             query = query.filter(author=author)
         subreddit = self.request.GET.get('subreddit')
+        if subreddit is not None:
+            query = query.filter(subreddit=subreddit)
         # TODO:params in url are like: subreddit=0&subreddit=2&subreddit=4&subreddit=5&subreddit=6
         # And overwrite the preceding one. How to get these as a list?
             # TODO: Check out how form sends the request and see if i can overwrite it
             # Maybe look at init, applY(self, request) functions?
-        return Submission.objects.filter(author=author, subreddit=subreddit, title__icontains=query).order_by(order)
+        return query.order_by(order).all()
