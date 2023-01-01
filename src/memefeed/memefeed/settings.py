@@ -51,6 +51,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django_prometheus',
     "reddit.apps.RedditConfig",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -62,6 +63,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -69,6 +71,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ROOT_URLCONF = "memefeed.urls"
@@ -96,15 +99,14 @@ WSGI_APPLICATION = "memefeed.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'memefeeddb',
-    #     'USER': 'memefeeduser',
-    #     'PASSWORD': 'mypassword',
-    #     'HOST': '127.0.0.1',    # TODO: Migration to high availability server / cloud
-    #     'PORT': '5432',
-    # }
-    "default": env.db(),
+    'default': {
+        'ENGINE': 'django_prometheus.db.backends.postgresql',
+        'NAME': 'memefeed',
+        'USER': 'memefeeduser',
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'db',    # TODO: Migration to high availability server / cloud
+        'PORT': '5432',
+    }
 }
 
 

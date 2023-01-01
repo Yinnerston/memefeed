@@ -1,8 +1,9 @@
 from django.db import models
 from math import floor
+from django_prometheus.models import ExportModelOperationsMixin
 
 
-class Author(models.Model):
+class Author(ExportModelOperationsMixin('author'), models.Model):
     """
     Author of a submission.
     """
@@ -14,7 +15,7 @@ class Author(models.Model):
         return self.name
 
 
-class Subreddit(models.Model):
+class Subreddit(ExportModelOperationsMixin('subreddit'), models.Model):
     """
     Subreddit.
     """
@@ -26,7 +27,7 @@ class Subreddit(models.Model):
         return self.name
 
 
-class Submission(models.Model):
+class Submission(ExportModelOperationsMixin('submission'), models.Model):
     """
     Submission made on a subreddit by an Author.
     """
