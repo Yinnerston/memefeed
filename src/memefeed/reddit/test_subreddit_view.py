@@ -40,7 +40,6 @@ class TestSubredditView(TestCase):
         """
         response = self.client.get(reverse('reddit:subreddit_view', args=("invalid_subreddit",)))
         # Check that there are 0 displayed submissions
-        print(response.content)
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "No submissions found")
         self.assertContains(response, "Invalid subreddit name")
