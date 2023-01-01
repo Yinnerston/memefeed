@@ -33,3 +33,23 @@ def filter_null_getattr_list_bleach(submission: praw.models.Submission, field_to
     if attr is not None:
         attr = bleach.clean(attr)
     return attr if attr is not None else {}
+
+def filter_getattr_media_metadata_image_url_list(submission: praw.models.Submission, media_metadata: str):
+    """
+    Get the media metadata if the submission has it, otherwise return [].
+    Used to retain metadata for galeries
+    """
+    # TODO: Make mgiration in Submissions and implement in scripts/reddit_etl.py
+    if media_metadata != "media_metadata":
+        return []
+    urls = []
+    try:
+        attr = getattr(submission, media_metadata)
+        for k, v in attr.items():
+            url = v['p'][0]['u']
+            url = url.split("?")[0].replace("preview","i")
+            urls.append(url)
+    except AttributeError:
+        urls = []
+    finally:
+        return urls
