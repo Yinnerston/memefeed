@@ -49,15 +49,13 @@
 								<div class="items">
 									{% for submission in submissions_list %}
 										{% comment %} 
-										<article class="item thumb span-1">
-											<h2>{{submission.title}}</h2>
-											<a href="{{submission.url}}" class="image">
-												<img src="{{submission.url}}" alt="" id="{{submission.id}}">
-											</a>
-										</article> 
+										See src\memefeed\reddit\templatetags\reddit_filter.py for implementation
 										{% endcomment %}
 										<article class="item thumb span-1">
-											<h2>{{submission.title}}</h2>
+											<h2>
+												{{submission.title}}<br>
+												<a href="{% url 'reddit:subreddit' submission.subreddit %}">r/{{submission.subreddit}}</a>
+											</h2>
 											{{ submission | display_media | safe }}
 										</article> 
 
