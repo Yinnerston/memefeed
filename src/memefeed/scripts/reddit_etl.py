@@ -9,7 +9,7 @@ from csv import reader
 from re import match
 import sentry_sdk
 
-# import requests
+import logging
 
 from scripts.etl_utils import *
 from reddit.models import Author, Subreddit, Submission
@@ -100,6 +100,8 @@ class RedditETL:
 
 
     def __init__(self, subreddits_csv="scripts/data/subreddits.csv"):
+        logging.basicConfig(filename='reddit_etl.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s')
+
         # Auth information is contained in praw.ini file. See setup.md
         self.reddit = praw.Reddit("memefeedbot")
         self.reddit.read_only = True
@@ -129,7 +131,9 @@ class RedditETL:
             return {}
         foreign_key_dependencies = {}
         obj = None
-        created = None
+        created_subreddit = False
+        created_author = False
+        created_submission = False
         try:
             # Each Reddit post --> (Author, Subreddit, Submission) is atomic
             with transaction.atomic():
@@ -151,6 +155,8 @@ class RedditETL:
                                 obj = Author.objects.get(name=output_model["name"])
                             except ObjectDoesNotExist:
                                 obj = Author.objects.create(**output_model)
+                                if obj:
+                                    created_author = True
                             foreign_key_dependencies["author"] = {
                                 "submission": obj,  # Primary key of Author used by Submission
                             }
@@ -159,6 +165,8 @@ class RedditETL:
                                 obj = Subreddit.objects.get(name=output_model["name"])
                             except ObjectDoesNotExist:
                                 obj = Subreddit.objects.create(**output_model)
+                                if obj:
+                                    created_subreddit = True
                             foreign_key_dependencies["subreddit"] = {
                                 "submission": obj,  # Primary key of Subreddit used by Submission
                             }
@@ -173,14 +181,26 @@ class RedditETL:
                                 obj = Submission.objects.get(id=output_model["id"])
                             except ObjectDoesNotExist:
                                 obj = Submission.objects.create(**output_model)
+                                if obj:
+                                    created_submission = True
+
                         
         except DatabaseError as e:
             # Expected behaviour for a invalid post is to report , ignore it and add subsequent posts
             sentry_sdk.capture_exception(e)
+            logging.error("Database Error:", e)
         except DomainException as domain_exception:
-            print("Invalid Domain:", domain_exception)
+            logging.info("Invalid Domain:", domain_exception)
         except Exception as e:
             sentry_sdk.capture_exception(e)
+            logging.error("Exception:", e)
+        else:
+            if created_author:
+                logging.info("Added Author: %s", foreign_key_dependencies["author"]["submission"])
+            if created_subreddit:
+                logging.info("Added Subreddit: %s", foreign_key_dependencies["subreddit"]["submission"])
+            if created_submission:
+                logging.info("Added Submission: %s", obj)
         return obj
 
     def _transform_top_submissions(self, top_submissions):
