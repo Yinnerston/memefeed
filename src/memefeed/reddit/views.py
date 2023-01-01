@@ -31,7 +31,7 @@ class IndexView(generic.ListView):
         items_len = 20
         # TODO: Future sprint, implement video, galleries
         #  | Q(domain="v.redd.it")
-        top_submissions = Submission.objects.filter(Q(domain="i.imgur.com") | Q(domain="i.redd.it")).order_by("-score", "title")
+        top_submissions = Submission.objects.filter(Q(domain__icontains="imgur.com") | Q(domain="i.redd.it")).order_by("-score", "title")
         return [top_submissions[i:i+items_len] for i in range(0, len(top_submissions), items_len)]
  
 

@@ -35,6 +35,7 @@ class IndexViewTest(TestCase):
         Wrapper for RedditETL._load_submission(id)
         """
         submission = IndexViewTest.instance.reddit.submission(id)
+        self.assertIsNotNone(submission)
         return IndexViewTest.instance._load_submission(submission)
 
     # Tests for image thumbnail    
@@ -45,10 +46,6 @@ class IndexViewTest(TestCase):
         jpg_submission = self.load_submission("zzycfr")
         # Check that jpg is loaded correctly
         response = self.client.get("/reddit/", data={})
-        print(response)
-        print(response.content)
-        print(response.status, response.status_code)
-
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotEqual(response.context["top_submissions_list"], [])
         index_jpg_submission = response.context["top_submissions_list"][0][0]
@@ -80,6 +77,7 @@ class IndexViewTest(TestCase):
         Test thumbnail correctly takes gif data from reddit.
         """
         gif_submission = self.load_submission("zzyds7")
+        self.assertNotEquals(Submission.objects.count(), 0)
         # Check that jpg is loaded correctly
         response = self.client.get("/reddit/", data={})
         self.assertEquals(response.status_code, HTTPStatus.OK)
@@ -107,9 +105,12 @@ class IndexViewTest(TestCase):
         Test thumbnail correctly takes image data from imgur.
         """
         imgur_submission = self.load_submission("100f2k6")
+        self.assertEqual(Submission.objects.count(), 1)
         # Check that jpg is loaded correctly
         response = self.client.get("/reddit/", data={})
         self.assertEquals(response.status_code, HTTPStatus.OK)
+
+        self.assertNotContains(response, "No submissions found", html=True)
         self.assertNotEqual(response.context["top_submissions_list"], [])
         index_imgur_submission = response.context["top_submissions_list"][0][0]
         self.assertEquals(imgur_submission, index_imgur_submission)

@@ -30,7 +30,7 @@ class Submission(models.Model):
     Submission made on a subreddit by an Author.
     """
 
-    id = models.CharField("Reddit post's ID", max_length=6, primary_key=True)
+    id = models.CharField("Reddit post's ID", max_length=10, primary_key=True)
     title = models.CharField("Title of a Reddit post", max_length=300)
     score = models.IntegerField("Upvotes")
     url = models.URLField("Submission URL")
