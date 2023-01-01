@@ -99,8 +99,9 @@ class RedditETL:
     }
 
 
-    def __init__(self, subreddits_csv="scripts/data/subreddits.csv"):
-        logging.basicConfig(filename='reddit_etl.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s')
+    def __init__(self, subreddits_csv="scripts/data/subreddits.csv", testing=False):
+        if not testing:
+            logging.basicConfig(filename='reddit_etl.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s')
 
         # Auth information is contained in praw.ini file. See setup.md
         self.reddit = praw.Reddit("memefeedbot")

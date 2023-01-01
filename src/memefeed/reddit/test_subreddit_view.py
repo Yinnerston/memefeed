@@ -8,7 +8,7 @@ class TestSubredditView(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Setup etl for whole class
-        cls.instance = RedditETL()
+        cls.instance = RedditETL(testing=True)
         sentry_sdk.init(dsn="")
         cls.ids = [
             "t3_zzye6e",    # jpg nsfw

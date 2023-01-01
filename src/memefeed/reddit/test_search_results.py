@@ -18,7 +18,7 @@ class SearchFormTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Setup etl for whole class
-        cls.instance = RedditETL()
+        cls.instance = RedditETL(testing=True)
         sentry_sdk.init(dsn="")
         # Set up data for the whole TestCase
         cls.ids = [
