@@ -177,6 +177,8 @@ class RedditETL:
         except DatabaseError as e:
             # Expected behaviour for a invalid post is to report , ignore it and add subsequent posts
             sentry_sdk.capture_exception(e)
+        except DomainException as domain_exception:
+            print("Invalid Domain:", domain_exception)
         except Exception as e:
             sentry_sdk.capture_exception(e)
         return obj

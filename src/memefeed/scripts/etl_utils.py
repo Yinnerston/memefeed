@@ -7,6 +7,13 @@ import pytz
 from datetime import datetime
 import bleach
 
+class DomainException(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+    def __str__(self) -> str:
+        return super().__str__() + str(self.domain)
+
 # Getattr wrapper functions for author, subreddit foreign key in Submission
 def author_getattr(submission: praw.models.Submission, field_to_get: str) -> str:
     return getattr(submission, field_to_get).name
@@ -53,3 +60,10 @@ def filter_getattr_media_metadata_image_url_list(submission: praw.models.Submiss
         urls = []
     finally:
         return urls
+
+def getattr_allowed_domains(submission: praw.models.Submission, domain: str):
+    attr = getattr(submission, domain)
+    # These are the currently allowed domains
+    if attr not in ["i.redd.it", "i.imgur.com"]:
+        raise DomainException(domain=attr)
+    return attr
