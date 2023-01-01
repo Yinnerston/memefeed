@@ -29,7 +29,7 @@ class SearchFormTest(TestCase):
             "t3_vj1p48",
             "t3_sphocx",
         ]
-        test_data = cls.instance.reddit.info(cls.ids)
+        test_data = cls.instance.reddit.info(fullnames=cls.ids)
         cls.instance._transform_top_submissions(test_data)
 
     def flatten_results_list(self, results_list):
