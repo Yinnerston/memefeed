@@ -11,7 +11,10 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install dependencies
-COPY requirements.txt .
+# copy project
+COPY . .
+
+RUN apk add --update apk-cron && rm -rf /var/cache/apk/*
 RUN apk update && apk add bash
 RUN \
  apk add --no-cache postgresql-libs && \
@@ -19,5 +22,7 @@ RUN \
  python3 -m pip install -r requirements.txt --no-cache-dir && \
  apk --purge del .build-deps
 
-# copy project
-COPY . .
+# schedule etl using cron
+RUN chmod 755 ./etl.sh ./entry.sh
+RUN /usr/bin/crontab ./crontab.txt
+CMD ["entry.sh"]

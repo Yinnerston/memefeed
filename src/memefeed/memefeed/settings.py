@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import environ
+import os
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -147,3 +148,10 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Logging
+LOG_PATH = os.path.join(BASE_DIR, "log/")
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+}

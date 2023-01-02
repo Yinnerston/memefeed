@@ -1,22 +1,18 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Header</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-        <!--[if lt IE 7]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
-        
-        <script src="" async defer></script>
-    </body>
-</html>
+{% load static %}
+
+<div class="headernav">
+    <link rel="stylesheet" href="{% static 'reddit/assets/css/header.css' %}">
+    {% url 'reddit:index' as index_url %}
+    {% url 'reddit:compose_search' as compose_search_url %}
+    {% comment %} {% url 'reddit:search_results' as results_url %} {% endcomment %}
+
+    <a href="{{ index_url }}"><h1 id="header_index_h1">Memefeed</h1></a>
+    {% comment %} <form action="{{ results_url }}" method="get">{% csrf_token %}
+        {{ form.q }}
+        {{ form.sort_by }}
+        <input type="submit" value="Search">
+    </form> {% endcomment %}
+    <form action="{{ compose_search_url }}">
+        <input type="submit" value="Compose Search" id="header_compose_search">
+    </form>
+</div>

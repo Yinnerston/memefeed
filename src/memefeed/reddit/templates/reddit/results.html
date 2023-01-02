@@ -1,0 +1,12 @@
+{% include "reddit/header.html" %}
+
+<h1>Results for: {{ q }}</h1>
+{% if results_list %}
+    <ul>
+    {% for result in results_list %}
+        <li> {{result.title}} by {{result.author}} on r/{{result.subreddit}} </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No submissions found.</p>
+{% endif %}

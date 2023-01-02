@@ -1,0 +1,38 @@
+{% extends "reddit/index.html" %}
+{% load reddit_filter %}
+
+
+{% block title %}Memefeed By Yinnerston{% endblock %}
+
+{%block page_name %}
+    {% if subreddit_not_found %}
+        <h2>Invalid subreddit name!</h2>
+    {% elif subreddit %}
+        <h2>Posts from r/{{subreddit.name}}</h2>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+	{% if page_obj %}
+		{% for submissions_list in page_obj %}
+			<div class="items">
+				{% for submission in submissions_list %}
+					{% comment %}
+					See src\memefeed\reddit\templatetags\reddit_filter.py for implementation
+					{% endcomment %}
+					<article class="item thumb span-1">
+						<h2>
+							{{submission.title}}<br>
+							<a href="{% url 'reddit:subreddit_view' submission.subreddit %}">r/{{submission.subreddit}}</a>
+						</h2>
+						{{ submission | display_media | safe }}
+					</article>
+
+
+				{% endfor %}
+			</div>
+		{% endfor %}
+	{% else %}
+		<p>No submissions found.</p>
+	{% endif %}
+{% endblock %}

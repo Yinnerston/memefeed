@@ -1,0 +1,1 @@
+* 1 * * * /etl.sh >> /var/log/script.log
