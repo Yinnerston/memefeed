@@ -55,6 +55,7 @@ class Submission(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
 
 
+# TODO: Future sprint: Implement image server
 class SubmissionFullImage(models.Model):
     """
     Full image relating to a submission.
@@ -65,6 +66,7 @@ class SubmissionFullImage(models.Model):
     image_ext = models.CharField("Image Extension E.G. jpg, png, gif", max_length=10)
 
 
+# TODO: Future sprint: Implement image server
 class SubmissionThumbnailImage(models.Model):
     """
     Thumbnail image relating to a submission.
