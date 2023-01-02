@@ -3,7 +3,7 @@ version: '3.8'
 services:
   memefeed:
     build: ./src/memefeed
-    # sh -c 'while !</dev/tcp/db/5432; do sleep 1; done; 
+    # sh -c 'while !</dev/tcp/db/5432; do sleep 1; done;
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./src/memefeed:/app
@@ -25,6 +25,6 @@ services:
       - POSTGRES_USER=memefeeduser
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=memefeed
-    
+
 volumes:
   postgres_data:

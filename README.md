@@ -17,7 +17,7 @@ https://memefeed.atlassian.net/
 
 # What I want to learn from this project
 
-A more comprehensive summary will be updated on https://docs.google.com/document/d/16yKagWcxLBqN6zkW80W9SA_MnSaP6UQx528HsZB_KFo/edit?usp=sharing 
+A more comprehensive summary will be updated on https://docs.google.com/document/d/16yKagWcxLBqN6zkW80W9SA_MnSaP6UQx528HsZB_KFo/edit?usp=sharing
 - Load balancing with Traefic
 - WSGI web servers
 - Caching with Redis
@@ -26,5 +26,5 @@ A more comprehensive summary will be updated on https://docs.google.com/document
 - Cron to pull data from reddit with PRAW
 - Security: SQL injection attack, SSL / HTTPS, XSS protection
 - Jinja2 templating
-- Backend monitoring and observability using Solarwind + Django admin panel 
+- Backend monitoring and observability using Solarwind + Django admin panel
 - Configure Apache production server for deployment

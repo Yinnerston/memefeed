@@ -26,4 +26,3 @@ RUN \
 RUN chmod 755 ./etl.sh ./entry.sh
 RUN /usr/bin/crontab ./crontab.txt
 CMD ["entry.sh"]
-

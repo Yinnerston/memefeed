@@ -17,7 +17,7 @@
 		{% for submissions_list in page_obj %}
 			<div class="items">
 				{% for submission in submissions_list %}
-					{% comment %} 
+					{% comment %}
 					See src\memefeed\reddit\templatetags\reddit_filter.py for implementation
 					{% endcomment %}
 					<article class="item thumb span-1">
@@ -26,13 +26,13 @@
 							<a href="{% url 'reddit:subreddit_view' submission.subreddit %}">r/{{submission.subreddit}}</a>
 						</h2>
 						{{ submission | display_media | safe }}
-					</article> 
+					</article>
 
-					
+
 				{% endfor %}
 			</div>
 		{% endfor %}
 	{% else %}
 		<p>No submissions found.</p>
-	{% endif %}						
+	{% endif %}
 {% endblock %}
