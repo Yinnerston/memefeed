@@ -21,7 +21,7 @@
 				<!-- Header -->
 					<section id="header">
 						{% include "reddit/header.html" %}
-						{% block page_name %}{% endblock %}   
+						{% block page_name %}{% endblock %}
 					</section>
 			<!-- Main -->
 					<section id="main">
@@ -30,7 +30,7 @@
                         {% block content %}
                         {% endblock %}
 
-						
+
 					</section>
 
 				<!-- Footer -->
@@ -42,11 +42,11 @@
 										<a href="?page=1">&laquo; first</a>
 										<a href="?page={{ page_obj.previous_page_number }}">previous</a>
 									{% endif %}
-							
+
 									<span class="current">
 										Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
 									</span>
-							
+
 									{% if page_obj.has_next %}
 										<a href="?page={{ page_obj.next_page_number }}">next</a>
 										<a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>

@@ -1,8 +1,9 @@
 # Setup
 
+- (Git): For development, Install requirements in a venv and run `pre-commit install` to add black code auto-formatting on your commits
 - Install postgres 13.9 with PGAdmin. This project assumes postgres runs on port 5432. (Default  for first time postgres installation).
-- For postgres setup, I follow this tutorial: https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-20-04 
-- In postgres shell: 
+- For postgres setup, I follow this tutorial: https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-20-04
+- In postgres shell:
 ```sql
 CREATE DATABASE memefeed;
 CREATE USER memefeeduser WITH PASSWORD 'PUT_YOU_PASSWORD_HERE';

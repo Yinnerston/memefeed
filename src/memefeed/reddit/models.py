@@ -3,7 +3,7 @@ from math import floor
 from django_prometheus.models import ExportModelOperationsMixin
 
 
-class Author(ExportModelOperationsMixin('author'), models.Model):
+class Author(ExportModelOperationsMixin("author"), models.Model):
     """
     Author of a submission.
     """
@@ -15,7 +15,7 @@ class Author(ExportModelOperationsMixin('author'), models.Model):
         return self.name
 
 
-class Subreddit(ExportModelOperationsMixin('subreddit'), models.Model):
+class Subreddit(ExportModelOperationsMixin("subreddit"), models.Model):
     """
     Subreddit.
     """
@@ -27,7 +27,7 @@ class Subreddit(ExportModelOperationsMixin('subreddit'), models.Model):
         return self.name
 
 
-class Submission(ExportModelOperationsMixin('submission'), models.Model):
+class Submission(ExportModelOperationsMixin("submission"), models.Model):
     """
     Submission made on a subreddit by an Author.
     """
@@ -56,6 +56,7 @@ class Submission(ExportModelOperationsMixin('submission'), models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
 
 
+# TODO: Future sprint: Implement image server
 class SubmissionFullImage(models.Model):
     """
     Full image relating to a submission.
@@ -66,6 +67,7 @@ class SubmissionFullImage(models.Model):
     image_ext = models.CharField("Image Extension E.G. jpg, png, gif", max_length=10)
 
 
+# TODO: Future sprint: Implement image server
 class SubmissionThumbnailImage(models.Model):
     """
     Thumbnail image relating to a submission.

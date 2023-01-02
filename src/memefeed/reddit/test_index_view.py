@@ -14,6 +14,11 @@ import urllib
 
 
 class IndexViewTest(TestCase):
+    """
+    # TODO: These tests test that the html is rendered.
+    THEY DO NOT test if images are displayed correctly i.e. check for onerror in html elements.
+    """
+
     @classmethod
     def setUpTestData(cls):
         # Setup etl for whole class
@@ -126,6 +131,27 @@ class IndexViewTest(TestCase):
             urllib.request.urlopen(index_imgur_submission.url).getcode(), HTTPStatus.OK
         )
         # Check that that the png has been rendered
+        self.assertContains(response, imgur_submission.title)
+
+    def test_thumbnail_imgur_video(self):
+        """
+        Test imgur video link.
+        """
+        imgur_submission = self.load_submission("1016e0z")
+        self.assertEqual(Submission.objects.count(), 1)
+        # Check that video is loaded correctly
+        response = self.client.get("/reddit/", data={})
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+
+        self.assertNotContains(response, "No submissions found")
+        self.assertNotEqual(response.context["top_submissions_list"], [])
+        index_imgur_submission = response.context["top_submissions_list"][0][0]
+        self.assertEquals(imgur_submission, index_imgur_submission)
+        # Check that the url can be opened
+        self.assertEquals(
+            urllib.request.urlopen(index_imgur_submission.url).getcode(), HTTPStatus.OK
+        )
+        # Check that that the video has been rendered
         self.assertContains(response, imgur_submission.title)
 
     def test_thumbnail_misc(self):
