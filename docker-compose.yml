@@ -18,13 +18,10 @@ services:
       - db
   prometheus:
     build: ./src/prometheus
-    command: python run_server.py
     volumes:
       - ./src/prometheus:/prometheus
     ports:
-      - 8001:8001
-    depends_on:
-      - memefeed
+      - 9090:9090
   db:
     image: postgres:13.9-alpine
     volumes:
