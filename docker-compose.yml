@@ -22,6 +22,12 @@ services:
       - ./src/prometheus:/prometheus
     ports:
       - 9090:9090
+  grafana:
+    build: ./src/grafana
+    volumes:
+      - ./src/grafana:/grafana
+    ports:
+      - 3000:3000
   db:
     image: postgres:13.9-alpine
     volumes:

@@ -32,3 +32,12 @@ user_agent=Alpine:memefeed:v1.0.0 (by u/YOUR_USERNAME)
 ```
 - Change the list of subreddits if you want in `src\memefeed\reddit\data\subreddits.csv`
 - Use black python code formatter
+
+
+# Setup Grafana + Prometheus
+- Go to localhost:3000
+- Log into grafana (default username: "admin", password: "admin") --> Change password and password
+- In your the grafana interface in your browser:
+    - Go Configuration > Data Sources
+    - Add data source > Pick Prometheus
+    - Set URL as http://prometheus:9090

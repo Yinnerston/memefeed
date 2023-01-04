@@ -1,4 +1,5 @@
-chunks_head
-wal
-lock
-queries.active
+# Ignore everything
+*
+# Whitelisted files
+!Dockerfile
+!prometheus.yml
