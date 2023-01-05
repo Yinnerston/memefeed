@@ -35,9 +35,12 @@ user_agent=Alpine:memefeed:v1.0.0 (by u/YOUR_USERNAME)
 
 
 # Setup Grafana + Prometheus
+- Add a password `GF_SECURITY_ADMIN_PASSWORD=PASSWORD_HERE` to the `.env` file
 - Go to localhost:3000
-- Log into grafana (default username: "admin", password: "admin") --> Change password and password
+- Login to grafana (You added the password to the .env file)
 - In your the grafana interface in your browser:
     - Go Configuration > Data Sources
     - Add data source > Pick Prometheus
     - Set URL as http://prometheus:9090
+    - Save and Test
+- Import the dashboards (*.json files) from the `data/grafana` directory
