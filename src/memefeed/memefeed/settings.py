@@ -15,6 +15,7 @@ import environ
 import os
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+from django.utils.log import DEFAULT_LOGGING
 
 sentry_sdk.init(
     dsn="https://88cd2a5285c848fb8601e23566969e45@o4504333010731009.ingest.sentry.io/4504365878673409",
@@ -153,8 +154,36 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Logging
+LOGGING_CONFIG = None
+LOGLEVEL = os.getenv("DJ_LOGLEVEL", "info").upper()
 LOG_PATH = os.path.join(BASE_DIR, "log/")
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        # Use JSON formatter as default
+        "default": {
+            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+        },
+        "django.server": DEFAULT_LOGGING["formatters"]["django.server"],
+    },
+    "handlers": {
+        # Route console logs to stdout
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "default",
+        },
+        "django.server": DEFAULT_LOGGING["handlers"]["django.server"],
+    },
+    "loggers": {
+        # Default logger for all modules
+        "": {
+            "level": LOGLEVEL,
+            "handlers": [
+                "console",
+            ],
+        },
+        # Default runserver request logging
+        "django.server": DEFAULT_LOGGING["loggers"]["django.server"],
+    },
 }

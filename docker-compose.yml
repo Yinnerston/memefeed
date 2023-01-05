@@ -1,5 +1,10 @@
 version: '3.8'
 
+x-logging: &loki-logging
+  driver: loki
+  options:
+    loki-url: "http://localhost:3100/api/prom/push"
+
 services:
   memefeed:
     build: ./src/memefeed
@@ -14,14 +19,20 @@ services:
       - DATABASE_URL=postgresql://memefeeduser:${POSTGRES_PASSWORD}@db:5432/memefeed
       - DJANGO_DEV_SECRET_KEY=${DJANGO_DEV_SECRET_KEY}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DJ_LOGLEVEL=INFO
+    logging: *loki-logging
     depends_on:
       - db
+    networks:
+      - memefeed-network
   prometheus:
     build: ./src/prometheus
     volumes:
       - ./src/prometheus:/prometheus
     ports:
       - 9090:9090
+    networks:
+      - memefeed-network
   grafana:
     build: ./src/grafana
     environment:
@@ -33,7 +44,9 @@ services:
       - 3000:3000
     depends_on:
       - prometheus
-    
+    logging: *loki-logging
+    networks:
+      - memefeed-network
   db:
     image: postgres:13.9-alpine
     volumes:
@@ -44,6 +57,8 @@ services:
       - POSTGRES_USER=memefeeduser
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=memefeed
+    networks:
+      - memefeed-network
   node-exporter:
     image: prom/node-exporter
     container_name: node-exporter
@@ -58,6 +73,8 @@ services:
     ports:
       - 9100:9100
     restart: on-failure
+    networks:
+      - memefeed-network
   cadvisor:
     image: google/cadvisor
     container_name: cadvisor
@@ -68,8 +85,26 @@ services:
     ports:
       - "${CADVISOR_PORT:-8080}:8080"
     restart: on-failure
-
+    networks:
+      - memefeed-network
+  loki:
+    image: grafana/loki:2.6.1
+    ports:
+      - 3100:3100
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - memefeed-network
+  promtail:
+    image: grafana/promtail:2.6.1
+    volumes:
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - memefeed-network
 
 
 volumes:
   postgres_data:
+
+networks:
+  memefeed-network:

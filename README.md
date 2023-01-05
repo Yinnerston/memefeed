@@ -28,3 +28,8 @@ A more comprehensive summary will be updated on https://docs.google.com/document
 - Jinja2 templating
 - Backend monitoring and observability using Solarwind + Django admin panel
 - Configure Apache production server for deployment
+
+# Setup:
+- Follow instructions in [setup.md](SETUP.md)
+- `docker-compose build`
+- `docker-compose up -d`

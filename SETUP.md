@@ -35,6 +35,7 @@ user_agent=Alpine:memefeed:v1.0.0 (by u/YOUR_USERNAME)
 
 
 # Setup Grafana + Prometheus
+- Install Docker plugin for Loki `docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions` in shell.
 - Add a password `GF_SECURITY_ADMIN_PASSWORD=PASSWORD_HERE` to the `.env` file
 - Go to localhost:3000
 - Login to grafana (You added the password to the .env file)
@@ -42,5 +43,9 @@ user_agent=Alpine:memefeed:v1.0.0 (by u/YOUR_USERNAME)
     - Go Configuration > Data Sources
     - Add data source > Pick Prometheus
     - Set URL as http://prometheus:9090
+    - Save and Test
+- Setup loki data source
+    - Add data source > Pick Loki
+    - Set URL as http://loki:3100
     - Save and Test
 - Import the dashboards (*.json files) from the `data/grafana` directory

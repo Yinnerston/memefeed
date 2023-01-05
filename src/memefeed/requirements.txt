@@ -27,8 +27,8 @@ platformdirs==2.6.0
 pmaw==2.1.3
 praw==7.6.1
 prawcore==2.3.0
-prometheus-client==0.15.0
 pre-commit==2.21.0
+prometheus-client==0.15.0
 psaw==0.1.0
 psycopg2==2.9.5
 PySocks==1.7.1
