@@ -57,7 +57,7 @@ services:
       - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
     ports:
       - 9100:9100
-    restart: always
+    restart: on-failure
   cadvisor:
     image: google/cadvisor
     container_name: cadvisor
@@ -67,7 +67,7 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
     ports:
       - "${CADVISOR_PORT:-8080}:8080"
-    restart: always
+    restart: on-failure
 
 
 
