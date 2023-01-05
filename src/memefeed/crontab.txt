@@ -1,1 +1,1 @@
-* 1 * * * /etl.sh >> /var/log/script.log
+* 1 * * * /app/etl.sh >> /var/log/script.log

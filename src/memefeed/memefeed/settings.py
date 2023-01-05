@@ -15,6 +15,7 @@ import environ
 import os
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+from django.utils.log import DEFAULT_LOGGING
 
 sentry_sdk.init(
     dsn="https://88cd2a5285c848fb8601e23566969e45@o4504333010731009.ingest.sentry.io/4504365878673409",
@@ -45,12 +46,14 @@ SECRET_KEY = env("DJANGO_DEV_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "memefeed"]
 
 
 # Application definition
 
+# TODO: https://github.com/korfuri/django-prometheus/blob/master/documentation/exports.md django prometheus export with wsgi/gunicorn
 INSTALLED_APPS = [
+    "django_prometheus",
     "reddit.apps.RedditConfig",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -62,6 +65,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -69,6 +73,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
 ROOT_URLCONF = "memefeed.urls"
@@ -96,15 +101,14 @@ WSGI_APPLICATION = "memefeed.wsgi.application"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'memefeeddb',
-    #     'USER': 'memefeeduser',
-    #     'PASSWORD': 'mypassword',
-    #     'HOST': '127.0.0.1',    # TODO: Migration to high availability server / cloud
-    #     'PORT': '5432',
-    # }
-    "default": env.db(),
+    "default": {
+        "ENGINE": "django_prometheus.db.backends.postgresql",
+        "NAME": "memefeed",
+        "USER": "memefeeduser",
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+        "HOST": "db",  # TODO: Migration to high availability server / cloud
+        "PORT": "5432",
+    }
 }
 
 
@@ -150,8 +154,36 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Logging
+LOGGING_CONFIG = None
+LOGLEVEL = os.getenv("DJ_LOGLEVEL", "info").upper()
 LOG_PATH = os.path.join(BASE_DIR, "log/")
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "formatters": {
+        # Use JSON formatter as default
+        "default": {
+            "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+        },
+        "django.server": DEFAULT_LOGGING["formatters"]["django.server"],
+    },
+    "handlers": {
+        # Route console logs to stdout
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "default",
+        },
+        "django.server": DEFAULT_LOGGING["handlers"]["django.server"],
+    },
+    "loggers": {
+        # Default logger for all modules
+        "": {
+            "level": LOGLEVEL,
+            "handlers": [
+                "console",
+            ],
+        },
+        # Default runserver request logging
+        "django.server": DEFAULT_LOGGING["loggers"]["django.server"],
+    },
 }

@@ -101,7 +101,7 @@ class RedditETL:
     def __init__(self, subreddits_csv="scripts/data/subreddits.csv", testing=False):
         if not testing:
             logging.basicConfig(
-                filename="reddit_etl.log",
+                filename="log/reddit_etl.log",
                 encoding="utf-8",
                 level=logging.DEBUG,
                 format="%(asctime)s %(message)s",

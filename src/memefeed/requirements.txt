@@ -11,6 +11,7 @@ distlib==0.3.6
 Django==4.1.4
 django-environ==0.9.0
 django-extensions==3.2.1
+django-prometheus==2.2.0
 exceptiongroup==1.1.0
 filelock==3.9.0
 h11==0.14.0
@@ -27,6 +28,7 @@ pmaw==2.1.3
 praw==7.6.1
 prawcore==2.3.0
 pre-commit==2.21.0
+prometheus-client==0.15.0
 psaw==0.1.0
 psycopg2==2.9.5
 PySocks==1.7.1
