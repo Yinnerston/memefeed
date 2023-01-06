@@ -1,10 +1,13 @@
 {% extends "reddit/base.html" %}
 {% load reddit_filter %}
+{% load static %}
 
 {% block title %}Memefeed By Yinnerston{% endblock %}
 
+<link rel="stylesheet" href="{% static 'reddit/assets/css/index.css' %}" />
+
 {%block page_name %}
-    <h2>Index Page</h2>
+    <h2>Top Posts Today!</h2>
 {% endblock %}
 
 
@@ -31,4 +34,10 @@
 	{% else %}
 		<p>No submissions found.</p>
 	{% endif %}
+{% endblock %}
+
+{% block footer %}
+	<a href="{% url 'reddit:search_results' %}">
+		<h2 class="FooterIndexLink">See All</h2>
+	</a>
 {% endblock %}

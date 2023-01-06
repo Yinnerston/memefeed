@@ -5,14 +5,10 @@
     {% url 'reddit:index' as index_url %}
     {% url 'reddit:compose_search' as compose_search_url %}
     {% comment %} {% url 'reddit:search_results' as results_url %} {% endcomment %}
-
-    <a href="{{ index_url }}"><h1 id="header_index_h1">Memefeed</h1></a>
-    {% comment %} <form action="{{ results_url }}" method="get">{% csrf_token %}
-        {{ form.q }}
-        {{ form.sort_by }}
-        <input type="submit" value="Search">
-    </form> {% endcomment %}
-    <form action="{{ compose_search_url }}">
-        <input type="submit" value="Compose Search" id="header_compose_search">
-    </form>
+    <section id="header_section1">
+        <a href="{{ index_url }}"><img src="{% static 'reddit/images/memefeed-logo.svg' %}" alt="Memefeed Logo" height="64px" width="auto"></a>
+    </section>
+    <section id="header_section2">
+        <a href="{{ compose_search_url }}"><img src="{% static 'reddit/images/compose-search-button.svg' %}" alt="Compose Search" height="64px" width="auto"></a>
+    </section>
 </div>
