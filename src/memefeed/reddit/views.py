@@ -82,7 +82,7 @@ class SearchResultsView(generic.ListView):
         """
         title = self.request.GET.get("q")
         sort_by = self.request.GET.get("sort_by")
-        order = SearchForm.get_order(sort_by)
+        order = SearchForm.get_order(int(sort_by))
         query = Submission.objects.filter(
             Q(domain="i.redd.it") | Q(domain="v.redd.it") | Q(domain="i.imgur.com")
         )
@@ -94,11 +94,11 @@ class SearchResultsView(generic.ListView):
             pass
 
         author = self.request.GET.get("author")
-        if author is not None or author != "":
+        if author:
             # TODO: IS this validation good enought?
             query = query.filter(author=author)
         subreddit = self.request.GET.get("subreddit")
-        if subreddit is not None:
+        if subreddit:
             query = query.filter(subreddit=subreddit)
         # TODO:params in url are like: subreddit=0&subreddit=2&subreddit=4&subreddit=5&subreddit=6
         # And overwrite the preceding one. How to get these as a list?
