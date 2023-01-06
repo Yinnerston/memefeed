@@ -19,7 +19,7 @@ services:
       - DATABASE_URL=postgresql://memefeeduser:${POSTGRES_PASSWORD}@db:5432/memefeed
       - DJANGO_DEV_SECRET_KEY=${DJANGO_DEV_SECRET_KEY}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - DJ_LOGLEVEL=INFO
+      - DJ_LOGLEVEL=DEBUG # Change in production
     logging: *loki-logging
     depends_on:
       - db
@@ -78,6 +78,8 @@ services:
   cadvisor:
     image: google/cadvisor
     container_name: cadvisor
+    command: 
+      - '--privileged=true'
     volumes:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
