@@ -19,5 +19,6 @@ from django.urls import include, path
 urlpatterns = [
     path("reddit/", include("reddit.urls")),
     path("admin/", admin.site.urls),
-    path('', include('django_prometheus.urls')),
+    path("__debug__/", include("debug_toolbar.urls")),
+    path("", include("django_prometheus.urls")),
 ]
