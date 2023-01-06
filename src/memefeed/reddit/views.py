@@ -8,6 +8,8 @@ from django.db.models import Q
 from .forms import SearchForm
 from .models import Submission, Subreddit
 
+from datetime import datetime, timedelta
+
 ITEMS_LEN = 20
 
 
@@ -32,16 +34,17 @@ class IndexView(generic.ListView):
         # Variable for how many submissions are displayed in a row in the index
         # TODO: Future sprint, implement video, galleries
         #  | Q(domain="v.redd.it")
+        prev_day = datetime.now().astimezone() - timedelta(weeks=1)
         top_submissions = (
             Submission.objects.filter(
                 Q(domain__icontains="imgur.com") | Q(domain="i.redd.it")
             )
-            .filter(
-                Q(url__endswith=".jpg")
-                | Q(url__endswith=".png")
-                | Q(url__endswith=".gif")
-            )
-            .order_by("-score", "title")
+            # .filter(
+            #     Q(url__endswith=".jpg")
+            #     | Q(url__endswith=".png")
+            #     | Q(url__endswith=".gif")
+            # )
+            .filter(created_utc__gte=prev_day).order_by("-score", "title")
         )
         return [
             top_submissions[i : i + ITEMS_LEN]
