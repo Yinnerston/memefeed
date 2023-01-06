@@ -67,6 +67,9 @@ class SubmissionFullImage(models.Model):
     image_ext = models.CharField("Image Extension E.G. jpg, png, gif", max_length=10)
 
 
+# TODO: https://docs.djangoproject.com/en/4.1/topics/db/optimization/
+# E.G. Cache queryset as a view
+
 # TODO: Future sprint: Implement image server
 class SubmissionThumbnailImage(models.Model):
     """

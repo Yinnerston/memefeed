@@ -8,6 +8,8 @@ from django.db.models import Q
 from .forms import SearchForm
 from .models import Submission, Subreddit
 
+ITEMS_LEN = 20
+
 
 class IndexView(generic.ListView):
     """
@@ -25,10 +27,9 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         """
         Returns the top submissions by score in descending order.
-        Submissions are grouped into sub-lists of length = items_len
+        Submissions are grouped into sub-lists of length = ITEMS_LEN
         """
         # Variable for how many submissions are displayed in a row in the index
-        items_len = 20
         # TODO: Future sprint, implement video, galleries
         #  | Q(domain="v.redd.it")
         top_submissions = (
@@ -43,8 +44,8 @@ class IndexView(generic.ListView):
             .order_by("-score", "title")
         )
         return [
-            top_submissions[i : i + items_len]
-            for i in range(0, len(top_submissions), items_len)
+            top_submissions[i : i + ITEMS_LEN]
+            for i in range(0, len(top_submissions), ITEMS_LEN)
         ]
 
 
@@ -66,7 +67,7 @@ class SearchResultsView(generic.ListView):
     template_name = "reddit/results.html"
     context_object_name = "results_list"
     model = Submission
-    # paginate_by = 60
+    paginate_by = 3
 
     def get_context_data(self, **kwargs):
         """
@@ -109,7 +110,11 @@ class SearchResultsView(generic.ListView):
         # And overwrite the preceding one. How to get these as a list?
         # TODO: Check out how form sends the request and see if i can overwrite it
         # Maybe look at init, applY(self, request) functions?
-        return query.order_by(order).all()
+        result_submissions = query.order_by(order).all()
+        return [
+            result_submissions[i : i + ITEMS_LEN]
+            for i in range(0, len(result_submissions), ITEMS_LEN)
+        ]
 
 
 class SubredditView(IndexView):
@@ -139,10 +144,10 @@ class SubredditView(IndexView):
     def get_queryset(self):
         """
         Returns the top submissions by score in descending order.
-        Submissions are grouped into sub-lists of length = items_len
+        Submissions are grouped into sub-lists of length = ITEMS_LEN
         """
         # Variable for how many submissions are displayed in a row in the index
-        items_len = 20
+        ITEMS_LEN = 20
         # TODO: Future sprint, implement video, galleries
         #  | Q(domain="v.redd.it")
         if not self.subreddit_not_found:
@@ -153,8 +158,8 @@ class SubredditView(IndexView):
                 .order_by("-score", "title")
             )
             return [
-                top_submissions[i : i + items_len]
-                for i in range(0, len(top_submissions), items_len)
+                top_submissions[i : i + ITEMS_LEN]
+                for i in range(0, len(top_submissions), ITEMS_LEN)
             ]
         else:
             return []

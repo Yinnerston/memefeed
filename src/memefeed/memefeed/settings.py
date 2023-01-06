@@ -171,13 +171,13 @@ LOGLEVEL = os.getenv("DJ_LOGLEVEL", "info").upper()
 LOG_PATH = os.path.join(BASE_DIR, "log/")
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": False,
+    "disable_existing_loggers": True,
     "formatters": {
         # Use JSON formatter as default
         "default": {
             "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
         },
-        "django.server": DEFAULT_LOGGING["formatters"]["django.server"],
+        # "django.server": DEFAULT_LOGGING["formatters"]["django.server"],
     },
     "handlers": {
         # Route console logs to stdout
@@ -185,7 +185,7 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "default",
         },
-        "django.server": DEFAULT_LOGGING["handlers"]["django.server"],
+        # "django.server": DEFAULT_LOGGING["handlers"]["django.server"],
     },
     "loggers": {
         # Default logger for all modules
@@ -196,6 +196,6 @@ LOGGING = {
             ],
         },
         # Default runserver request logging
-        "django.server": DEFAULT_LOGGING["loggers"]["django.server"],
+        # "django.server": DEFAULT_LOGGING["loggers"]["django.server"],
     },
 }
