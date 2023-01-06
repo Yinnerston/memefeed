@@ -76,30 +76,35 @@ class SearchResultsView(generic.ListView):
         context["q"] = self.request.GET.get("q")
         return context
 
+    def parse_subreddits_current_path(self):
+        current_path = self.request.get_full_path()
+        subreddits = [
+            subreddit[10:]
+            for subreddit in current_path.split("&")
+            if subreddit.startswith("subreddit=")
+        ]
+        return subreddits
+
     def get_queryset(self):
         """
         Handles generation of results.
         """
+        filtered_subreddits = self.parse_subreddits_current_path()
         title = self.request.GET.get("q")
         sort_by = self.request.GET.get("sort_by")
         order = SearchForm.get_order(int(sort_by))
         query = Submission.objects.filter(
             Q(domain="i.redd.it") | Q(domain="v.redd.it") | Q(domain="i.imgur.com")
         )
-        if query is not None and query != "":
+        if query:
             # Get specific title
             query = query.filter(title__icontains=title)
-        elif query == "":
-            # Accept any title
-            pass
-
         author = self.request.GET.get("author")
         if author:
             # TODO: IS this validation good enought?
             query = query.filter(author=author)
-        subreddit = self.request.GET.get("subreddit")
-        if subreddit:
-            query = query.filter(subreddit=subreddit)
+        if filtered_subreddits:
+            query = query.filter(subreddit__in=filtered_subreddits)
         # TODO:params in url are like: subreddit=0&subreddit=2&subreddit=4&subreddit=5&subreddit=6
         # And overwrite the preceding one. How to get these as a list?
         # TODO: Check out how form sends the request and see if i can overwrite it
