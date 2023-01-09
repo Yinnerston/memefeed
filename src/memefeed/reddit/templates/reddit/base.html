@@ -20,8 +20,10 @@
 			<div id="wrapper">
 				<!-- Header -->
 					<section id="header">
-						{% include "reddit/header.html" %}
-						{% block page_name %}{% endblock %}
+						<div id="headerDiv">
+							{% include "reddit/header.html" %}
+							{% block page_name %}{% endblock %}	
+						</div>
 					</section>
 			<!-- Main -->
 					<section id="main">
@@ -53,6 +55,7 @@
 									{% endif %}
 								</span>
 							</div>
+							{% block footer %}{% endblock %}
 						</section>
 						<section>
 							<ul class="icons">

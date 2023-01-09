@@ -11,6 +11,7 @@ from reddit.models import Author, Subreddit, Submission
 from http import HTTPStatus
 import sentry_sdk
 import urllib
+from datetime import datetime, timedelta
 
 
 class IndexViewTest(TestCase):
@@ -18,6 +19,15 @@ class IndexViewTest(TestCase):
     # TODO: These tests test that the html is rendered.
     THEY DO NOT test if images are displayed correctly i.e. check for onerror in html elements.
     """
+
+    curTime = datetime.now().astimezone() - timedelta(minutes=10)
+
+    def setCurTimeRecent(self, submission_obj: Submission):
+        """
+        Set the created_utc attribute of a submission to the 10 minutes before test init.
+        """
+        submission_obj.created_utc = IndexViewTest.curTime
+        submission_obj.save()
 
     @classmethod
     def setUpTestData(cls):
@@ -43,7 +53,9 @@ class IndexViewTest(TestCase):
         """
         submission = IndexViewTest.instance.reddit.submission(id)
         self.assertIsNotNone(submission)
-        return IndexViewTest.instance._load_submission(submission)
+        loaded_submission = IndexViewTest.instance._load_submission(submission)
+        self.setCurTimeRecent(loaded_submission)
+        return loaded_submission
 
     # Tests for image thumbnail
     def test_thumbnail_ireddit_jpg(self):

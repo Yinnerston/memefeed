@@ -24,12 +24,12 @@ class SearchFormTest(TestCase):
         sentry_sdk.init(dsn="")
         # Set up data for the whole TestCase
         cls.ids = [
-            "t3_zvn17h",
-            "t3_zvms2j",
-            "t3_zvmrlj",
-            "t3_tqbf9w",
-            "t3_vj1p48",
-            "t3_sphocx",
+            "t3_zzyds7",  # gif on test_memefeed
+            "t3_zzydk5",  # png on test_memefeed
+            "t3_zzycfr",  # jpg on test_memefeed
+            "t3_104wtz7",  # png on u_YinnerstonTest
+            "t3_104wtfy",  # jpg on u_YinnerstonTest
+            "t3_10770f4",  # jpg on u_YinnerstonMemefeed
         ]
         test_data = cls.instance.reddit.info(fullnames=cls.ids)
         cls.instance._transform_top_submissions(test_data)
@@ -43,7 +43,7 @@ class SearchFormTest(TestCase):
         Test search by exact title returns a result
         """
         # Title corresponding to submission id=zvms2j
-        exact_title = "First post on test_memefeed"
+        exact_title = "Test JPG"
         response = self.client.get(
             "/reddit/search/results", data={"q": exact_title, "sort_by": 0}
         )
@@ -84,7 +84,7 @@ class SearchFormTest(TestCase):
         self.assertEqual(len(results_list), 0)
 
     # Test search with filter by subreddit
-    def test_search_filter_by_subreddit(self):
+    def test_search_filter_by_specific_subreddit(self):
         """
         Test search by specific subreddit
         """
@@ -100,6 +100,23 @@ class SearchFormTest(TestCase):
         self.assertEqual(len(results_list), 3)
         for result in results_list:
             self.assertEquals(result.subreddit.name, "test_memefeed")
+
+    def test_search_filter_by_multiple_subreddit(self):
+        """
+        TODO:
+        """
+        response = self.client.get(
+            "/reddit/search/results?q=&subreddit=test_memefeed&subreddit=u_YinnerstonTest&sort_by=0",
+            # data={"q": "", "sort_by": 0, "subreddit": "test_memefeed"},
+        )
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertNotContains(response, "No submissions found")
+        # Check all submissions are part of test_memefeed
+        results_list = self.flatten_results_list(response.context["results_list"])
+        self.assertEqual(len(results_list), 5)
+
+        for result in results_list:
+            self.assertIn(result.subreddit.name, ["test_memefeed", "u_YinnerstonTest"])
 
     def test_search_by_invalid_subreddit(self):
         """
@@ -122,15 +139,15 @@ class SearchFormTest(TestCase):
         # Title corresponding to submission id=zvms2j
         response = self.client.get(
             "/reddit/search/results",
-            data={"q": "", "sort_by": 0, "author": "YinnerstonMemefeed"},
+            data={"q": "", "sort_by": 0, "author": "YinnerstonTest"},
         )
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotContains(response, "No submissions found")
-        # Check all submissions are part of test_memefeed
+        # Check all submissions were authored by YinnerstonTest
         results_list = self.flatten_results_list(response.context["results_list"])
-        self.assertEqual(len(results_list), 2)
+        self.assertEqual(len(results_list), 5)
         for result in results_list:
-            self.assertEquals(result.author.name, "YinnerstonMemefeed")
+            self.assertEquals(result.author.name, "YinnerstonTest")
 
     def test_search_by_invalid_author(self):
         """
@@ -166,7 +183,7 @@ class SearchFormTest(TestCase):
         self.assertNotContains(response, "No submissions found")
         # Check that submissions are descending by score
         results_list = self.flatten_results_list(response.context["results_list"])
-        self.assertEqual(len(results_list), 6)
+        self.assertEqual(len(results_list), len(self.ids))
         prev_score = None
         for result in results_list:
             if prev_score is not None:
@@ -188,7 +205,7 @@ class SearchFormTest(TestCase):
         self.assertNotContains(response, "No submissions found")
         # Check that submissions are descending by created_utc
         results_list = self.flatten_results_list(response.context["results_list"])
-        self.assertEqual(len(results_list), 6)
+        self.assertEqual(len(results_list), len(self.ids))
         prev_time = None
         for result in results_list:
             if prev_time is not None:
@@ -210,7 +227,7 @@ class SearchFormTest(TestCase):
         self.assertNotContains(response, "No submissions found")
         # Check that submissions are descending by score
         results_list = self.flatten_results_list(response.context["results_list"])
-        self.assertEqual(len(results_list), 6)
+        self.assertEqual(len(results_list), len(self.ids))
         prev_title = None
         for result in results_list:
             if prev_title is not None:

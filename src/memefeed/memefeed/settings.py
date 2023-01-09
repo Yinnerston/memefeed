@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "debug_toolbar",
     "django_extensions",
 ]
 
@@ -73,6 +74,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
@@ -95,6 +97,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "memefeed.wsgi.application"
+
+# Django Debug Toolbar: Set INTERNAL_IPS in docker
+if DEBUG:
+    import socket  # only if you haven't already imported this
+
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + [
+        "127.0.0.1",
+        "10.0.2.2",
+    ]
 
 
 # Database
@@ -159,13 +171,13 @@ LOGLEVEL = os.getenv("DJ_LOGLEVEL", "info").upper()
 LOG_PATH = os.path.join(BASE_DIR, "log/")
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": False,
+    "disable_existing_loggers": True,
     "formatters": {
         # Use JSON formatter as default
         "default": {
             "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
         },
-        "django.server": DEFAULT_LOGGING["formatters"]["django.server"],
+        # "django.server": DEFAULT_LOGGING["formatters"]["django.server"],
     },
     "handlers": {
         # Route console logs to stdout
@@ -173,7 +185,7 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "default",
         },
-        "django.server": DEFAULT_LOGGING["handlers"]["django.server"],
+        # "django.server": DEFAULT_LOGGING["handlers"]["django.server"],
     },
     "loggers": {
         # Default logger for all modules
@@ -184,6 +196,6 @@ LOGGING = {
             ],
         },
         # Default runserver request logging
-        "django.server": DEFAULT_LOGGING["loggers"]["django.server"],
+        # "django.server": DEFAULT_LOGGING["loggers"]["django.server"],
     },
 }

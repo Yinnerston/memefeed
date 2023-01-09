@@ -24,6 +24,6 @@ RUN apt-get update && apt-get install -y \
 RUN python -m pip install -r requirements.txt --no-cache-dir
 
 # schedule etl using cron
-RUN chmod 755 ./etl.sh ./entry.sh
+RUN chmod 755 ./entry.sh
 RUN /usr/bin/crontab ./crontab.txt
 CMD ["entry.sh"]

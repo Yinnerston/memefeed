@@ -1,22 +1,12 @@
-#header_index_h1    {
-    margin-right: 10px;
-    color: black;
-}
-
-#header_index_h1:hover  {
-    color: red;
-}
-
-#header_compose_search, select, textarea  {
-    color: black;
-}
-
-#header_compose_search:hover  {
-    color: red;
-}
+html,body{height:100%}
 
 .headernav  {
     display: flex;
+    justify-content: space-between;
     margin-top: auto;
     margin-bottom: auto;
+}
+
+#header_section2    {
+    margin-left: 20px;
 }

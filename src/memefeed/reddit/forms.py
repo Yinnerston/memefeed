@@ -14,7 +14,7 @@ class SearchForm(forms.Form):
 
     # Fields in the form
     template_name = "search_form.html"
-    q = forms.CharField(label="Search Term", max_length=300)
+    q = forms.CharField(label="Search Term", max_length=300, required=False)
     subreddit = forms.MultipleChoiceField(
         label="r/subreddit",
         widget=forms.CheckboxSelectMultiple,
