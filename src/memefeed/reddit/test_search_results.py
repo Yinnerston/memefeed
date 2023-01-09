@@ -109,7 +109,6 @@ class SearchFormTest(TestCase):
             "/reddit/search/results?q=&subreddit=test_memefeed&subreddit=u_YinnerstonTest&sort_by=0",
             # data={"q": "", "sort_by": 0, "subreddit": "test_memefeed"},
         )
-        print(response.context)
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotContains(response, "No submissions found")
         # Check all submissions are part of test_memefeed
