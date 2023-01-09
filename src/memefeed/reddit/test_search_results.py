@@ -101,11 +101,23 @@ class SearchFormTest(TestCase):
         for result in results_list:
             self.assertEquals(result.subreddit.name, "test_memefeed")
 
-    def test_search_filter_by_specific_subreddit(self):
+    def test_search_filter_by_multiple_subreddit(self):
         """
         TODO:
         """
-        pass
+        response = self.client.get(
+            "/reddit/search/results?q=&subreddit=test_memefeed&subreddit=u_YinnerstonTest&sort_by=0",
+            # data={"q": "", "sort_by": 0, "subreddit": "test_memefeed"},
+        )
+        print(response.context)
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertNotContains(response, "No submissions found")
+        # Check all submissions are part of test_memefeed
+        results_list = self.flatten_results_list(response.context["results_list"])
+        self.assertEqual(len(results_list), 5)
+
+        for result in results_list:
+            self.assertIn(result.subreddit.name, ["test_memefeed", "u_YinnerstonTest"])
 
     def test_search_by_invalid_subreddit(self):
         """
