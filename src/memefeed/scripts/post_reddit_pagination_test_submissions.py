@@ -11,11 +11,12 @@ import praw
 
 
 r = praw.Reddit("memefeedscript")
-meow = r.subreddit("meow_irl").top(time_filter="year", limit=50)
+meow = r.subreddit("meow_irl").top(time_filter="year", limit=100)
 dataset = [
     submission.url
     for submission in meow
     if submission.url.endswith(".jpg")
+    or submission.url.endswith(".png")
     and submission.url.startswith("https://i.redd.it/")
 ]
 for idx, entry in enumerate(dataset):
