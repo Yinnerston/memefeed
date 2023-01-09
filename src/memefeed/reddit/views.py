@@ -8,7 +8,7 @@ from django.db.models import Q
 from .forms import SearchForm
 from .models import Submission, Subreddit
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 ITEMS_LEN = 20
 
@@ -18,10 +18,6 @@ class IndexView(generic.ListView):
     View for index page.
     """
 
-    # TODO: Form with search query --> Pass filter in listview
-    # Look at django filter by carlton gibsen
-    # Add form validation
-    # Q Object to do more complex filters
     template_name = "reddit/index.html"
     context_object_name = "top_submissions_list"
     paginate_by = 3
@@ -29,22 +25,21 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         """
         Returns the top submissions by score in descending order.
+        Top submissions are per week.
+        The relevant 'day' for the recent top posts changes every day to make caching easier.
         Submissions are grouped into sub-lists of length = ITEMS_LEN
         """
         # Variable for how many submissions are displayed in a row in the index
         # TODO: Future sprint, implement video, galleries
-        #  | Q(domain="v.redd.it")
-        prev_day = datetime.now().astimezone() - timedelta(weeks=1)
+        prev_week = datetime.today().replace(
+            hour=23, minute=59, second=59
+        ).astimezone() - timedelta(weeks=1)
         top_submissions = (
             Submission.objects.filter(
                 Q(domain__icontains="imgur.com") | Q(domain="i.redd.it")
             )
-            # .filter(
-            #     Q(url__endswith=".jpg")
-            #     | Q(url__endswith=".png")
-            #     | Q(url__endswith=".gif")
-            # )
-            .filter(created_utc__gte=prev_day).order_by("-score", "title")
+            .filter(created_utc__gte=prev_week)
+            .order_by("-score", "title")
         )
         return [
             top_submissions[i : i + ITEMS_LEN]
@@ -55,6 +50,7 @@ class IndexView(generic.ListView):
 class SearchView(FormView):
     """
     View that composes the search/query.
+    Uses SearchForm from reddit/forms.py
     """
 
     template_name = "reddit/search_form.html"
@@ -64,7 +60,7 @@ class SearchView(FormView):
 
 class SearchResultsView(generic.ListView):
     """
-    View that displays the results of a search
+    View that displays the results of a search.
     """
 
     template_name = "reddit/results.html"
@@ -72,6 +68,7 @@ class SearchResultsView(generic.ListView):
     model = Submission
     paginate_by = 3
 
+    # TODO: Add form validation
     def get_context_data(self, **kwargs):
         """
         Extra arguments passed to template
@@ -109,10 +106,6 @@ class SearchResultsView(generic.ListView):
             query = query.filter(author=author)
         if filtered_subreddits:
             query = query.filter(subreddit__in=filtered_subreddits)
-        # TODO:params in url are like: subreddit=0&subreddit=2&subreddit=4&subreddit=5&subreddit=6
-        # And overwrite the preceding one. How to get these as a list?
-        # TODO: Check out how form sends the request and see if i can overwrite it
-        # Maybe look at init, applY(self, request) functions?
         result_submissions = query.order_by(order).all()
         return [
             result_submissions[i : i + ITEMS_LEN]
@@ -121,6 +114,11 @@ class SearchResultsView(generic.ListView):
 
 
 class SubredditView(IndexView):
+    """
+    Best posts all time on a subreddit.
+    Same as search but just filter by subreddit
+    """
+
     template_name = "reddit/subreddit.html"
     context_object_name = "top_submissions_list"
     paginate_by = 3
@@ -150,7 +148,6 @@ class SubredditView(IndexView):
         Submissions are grouped into sub-lists of length = ITEMS_LEN
         """
         # Variable for how many submissions are displayed in a row in the index
-        ITEMS_LEN = 20
         # TODO: Future sprint, implement video, galleries
         #  | Q(domain="v.redd.it")
         if not self.subreddit_not_found:
