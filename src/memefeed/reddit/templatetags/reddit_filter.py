@@ -20,7 +20,9 @@ def display_media(submission, autoescape=True):
         if submission.domain == "i.redd.it" or submission.domain == "i.imgur.com":
             # Image (jpg, png, gif) from reddit or imgur
             tmp_url = esc(submission.url)
-            article = f'<a href="{tmp_url}" class="image"><img src="{tmp_url}" alt="" id="{submission.id}"></a>'
+            article = f'<a href="{tmp_url}" class="image">\
+            <img src="{tmp_url}" alt="" id="{submission.id}">\
+            </a>'
         elif submission.domain == "v.redd.it":
             # Video
             pass

@@ -33,7 +33,6 @@ user_agent=Alpine:memefeed:v1.0.0 (by u/YOUR_USERNAME)
 - Change the list of subreddits if you want in `src\memefeed\reddit\data\subreddits.csv`
 - Use black python code formatter
 
-
 # Setup Grafana + Prometheus
 - Install Docker plugin for Loki `docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions` in shell.
 - Add a password `GF_SECURITY_ADMIN_PASSWORD=PASSWORD_HERE` to the `.env` file

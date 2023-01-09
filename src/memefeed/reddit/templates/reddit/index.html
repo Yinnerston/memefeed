@@ -1,10 +1,11 @@
 {% extends "reddit/base.html" %}
 {% load reddit_filter %}
+{% load static %}
 
 {% block title %}Memefeed By Yinnerston{% endblock %}
 
 {%block page_name %}
-    <h2>Index Page</h2>
+    <h2>Top Posts This Week!</h2>
 {% endblock %}
 
 
@@ -18,8 +19,9 @@
 					{% endcomment %}
 					<article class="item thumb span-1">
 						<h2>
-							{{submission.title}}<br>
-							<a href="{% url 'reddit:subreddit_view' submission.subreddit %}">r/{{submission.subreddit}}</a>
+							<strong>{{submission.title}}</strong><br>
+							<a href="{% url 'reddit:subreddit_view' submission.subreddit %}">r/{{submission.subreddit}}</a><br>
+							u/{{submission.author}}
 						</h2>
 						{{ submission | display_media | safe }}
 					</article>
@@ -31,4 +33,10 @@
 	{% else %}
 		<p>No submissions found.</p>
 	{% endif %}
+{% endblock %}
+
+{% block footer %}
+	<a href="{% url 'reddit:search_results' %}">
+		<h2 class="FooterIndexLink">See All</h2>
+	</a>
 {% endblock %}
