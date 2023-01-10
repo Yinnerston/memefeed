@@ -78,8 +78,6 @@ services:
   cadvisor:
     image: google/cadvisor
     container_name: cadvisor
-    command: 
-      - '--privileged=true'
     volumes:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
