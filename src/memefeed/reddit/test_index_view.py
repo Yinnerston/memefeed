@@ -201,7 +201,7 @@ class IndexViewTest(TestCase):
         pass
 
 
-def IndexViewSeleniumTest(LiveServerTestCase):
+class IndexViewSeleniumTest(LiveServerTestCase):
     """
     Selenium test case to simulate user actions like clicks and accessing next page.
     """

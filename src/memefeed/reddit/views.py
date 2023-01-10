@@ -75,6 +75,7 @@ class SearchResultsView(generic.ListView):
         """
         context = super(SearchResultsView, self).get_context_data(**kwargs)
         context["q"] = self.request.GET.get("q")
+        context["sort_by"] = self.request.GET.get("sort_by")
         return context
 
     def parse_subreddits_current_path(self):
@@ -93,11 +94,14 @@ class SearchResultsView(generic.ListView):
         filtered_subreddits = self.parse_subreddits_current_path()
         title = self.request.GET.get("q")
         sort_by = self.request.GET.get("sort_by")
-        order = SearchForm.get_order(int(sort_by))
+        if sort_by:
+            order = SearchForm.get_order(int(sort_by))
+        else:
+            order = SearchForm.get_order(0)
         query = Submission.objects.filter(
             Q(domain="i.redd.it") | Q(domain="v.redd.it") | Q(domain="i.imgur.com")
         )
-        if query:
+        if title:
             # Get specific title
             query = query.filter(title__icontains=title)
         author = self.request.GET.get("author")
