@@ -8,6 +8,7 @@ from django.db.models import Q
 from .forms import SearchForm
 from .models import Submission, Subreddit
 
+from hashlib import md5
 from datetime import date, datetime, timedelta
 
 ITEMS_LEN = 20
@@ -62,6 +63,7 @@ class SearchResultsView(generic.ListView):
     View that displays the results of a search.
     """
 
+    MAX_PAGE_DIGITS = 4
     template_name = "reddit/results.html"
     context_object_name = "results_list"
     model = Submission
@@ -75,6 +77,17 @@ class SearchResultsView(generic.ListView):
         context = super(SearchResultsView, self).get_context_data(**kwargs)
         context["q"] = self.request.GET.get("q")
         context["sort_by"] = self.request.GET.get("sort_by")
+        # Saved context variable "results_cache_key" is results_cache_key + page number
+        # Assume the number of pages will not reach MAX_PAGE_DIGITS digits
+        results_cache_key = self.request.GET.get("results_cache_key")
+        if results_cache_key:
+            context["results_cache_key"] = results_cache_key[
+                : self.MAX_PAGE_DIGITS * -1
+            ] + self.request.GET.get("page").zfill(self.MAX_PAGE_DIGITS)
+        else:
+            context["results_cache_key"] = md5(
+                self.request.get_full_path().encode("utf-8")
+            ).hexdigest()[:6] + "1".zfill(self.MAX_PAGE_DIGITS)
         return context
 
     def parse_subreddits_current_path(self):
