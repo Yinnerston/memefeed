@@ -108,11 +108,23 @@ services:
       # - ./redis.conf:/usr/local/etc/redis/redis.conf # use default config
       - "redis:/data"
     ports:
-      - "6019:6379"
+      - 6379:6379
     command: redis-server
     networks:
       - memefeed-network
-
+  redis-exporter:
+    image: oliver006/redis_exporter
+    ports:
+      - 9121:9121
+    environment:
+      REDIS_ADDR: redis_cache:6379
+      # REDIS_USER: ${REDIS_USERNAME}
+      # REDIS_PASSWORD: ${REDIS_PASSWORD}
+    links:
+      - redis_cache
+      - prometheus
+    networks:
+      - memefeed-network
 
 volumes:
   postgres_data:

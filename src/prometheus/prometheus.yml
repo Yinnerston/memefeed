@@ -46,4 +46,8 @@ scrape_configs:
     scrape_interval: 5s
 
     static_configs:
-    - targets: ['node-exporter:9100']    
+    - targets: ['node-exporter:9100']
+
+  - job_name: redis
+    static_configs:
+    - targets: ['redis-exporter:9121']

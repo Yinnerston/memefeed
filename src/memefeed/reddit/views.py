@@ -85,9 +85,11 @@ class SearchResultsView(generic.ListView):
                 : self.MAX_PAGE_DIGITS * -1
             ] + self.request.GET.get("page").zfill(self.MAX_PAGE_DIGITS)
         else:
-            context["results_cache_key"] = md5(
-                self.request.get_full_path().encode("utf-8")
-            ).hexdigest()[:6] + "1".zfill(self.MAX_PAGE_DIGITS)
+            # Split on argument params minus csrf_token
+            url_params = self.request.get_full_path().split("&", 1)[1].encode("utf-8")
+            context["results_cache_key"] = md5(url_params).hexdigest()[:6] + "1".zfill(
+                self.MAX_PAGE_DIGITS
+            )
         return context
 
     def parse_subreddits_current_path(self):
