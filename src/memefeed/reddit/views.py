@@ -35,12 +35,11 @@ class IndexView(generic.ListView):
             hour=23, minute=59, second=59
         ).astimezone() - timedelta(weeks=1)
         top_submissions = (
-            Submission.objects.filter(
-                Q(domain__icontains="imgur.com") | Q(domain="i.redd.it")
-            )
-            .filter(created_utc__gte=prev_week)
+            Submission.objects.filter(created_utc__gte=prev_week)
+            .filter(Q(domain__icontains="imgur.com") | Q(domain="i.redd.it"))
             .order_by("-score", "title")
         )
+
         return [
             top_submissions[i : i + ITEMS_LEN]
             for i in range(0, len(top_submissions), ITEMS_LEN)
