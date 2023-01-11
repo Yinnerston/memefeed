@@ -116,7 +116,7 @@ class SearchResultsView(generic.ListView):
         ]
 
 
-class SubredditView(IndexView):
+class SubredditView(generic.ListView):
     """
     Best posts all time on a subreddit.
     Same as search but just filter by subreddit

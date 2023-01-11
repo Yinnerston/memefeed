@@ -2,6 +2,7 @@
 Test IndexView and index.html template
 """
 
+from django.core.cache import cache
 from django.test import TestCase, LiveServerTestCase
 from django.urls import reverse
 from scripts.reddit_etl import RedditETL
@@ -45,6 +46,10 @@ class IndexViewTest(TestCase):
         # ]
         # test_data = cls.instance.reddit.info(fullnames=cls.ids)
         # cls.instance._transform_top_submissions(test_data)
+
+    def tearDown(self):
+        super().tearDown()
+        cache.clear()
 
     def load_submission(self, id):
         """
