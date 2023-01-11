@@ -19,13 +19,14 @@ https://memefeed.atlassian.net/
 
 A more comprehensive summary will be updated on https://docs.google.com/document/d/16yKagWcxLBqN6zkW80W9SA_MnSaP6UQx528HsZB_KFo/edit?usp=sharing
 - Load balancing with Traefic
-- WSGI web servers
+- gunicorn WSGI web server
 - Caching with Redis
+- Monitoring suite using Prometheus + Grafana dashboarding, Grafana Loki
 - Postgres optimizations such as different joins, relationship types, full text search, indexing, JSONB
 - Celery / RabbitMQ task queues for serving images
 - Cron to pull data from reddit with PRAW
 - Security: SQL injection attack, SSL / HTTPS, XSS protection
-- Jinja2 templating
+- Django templating
 - Backend monitoring and observability using Solarwind + Django admin panel
 - Configure Apache production server for deployment
 
