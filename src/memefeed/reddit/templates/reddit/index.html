@@ -21,7 +21,7 @@
 						<h2>
 							<strong>{{submission.title}}</strong><br>
 							<a href="{% url 'reddit:subreddit_view' submission.subreddit %}">r/{{submission.subreddit}}</a><br>
-							u/{{submission.author}}
+							{{ submission.score }}⬆️ by u/{{submission.author}}
 						</h2>
 						{{ submission | display_media | safe }}
 					</article>
