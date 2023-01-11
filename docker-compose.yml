@@ -101,10 +101,21 @@ services:
     command: -config.file=/etc/promtail/config.yml
     networks:
       - memefeed-network
+  redis_cache:
+    image: redis:4-alpine
+    restart: always
+    volumes:
+      # - ./redis.conf:/usr/local/etc/redis/redis.conf # use default config
+      - "redis:/data"
+    ports:
+      - "6019:6379"
+    command: redis-server
+    networks:
+      - memefeed-network
 
 
 volumes:
   postgres_data:
-
+  redis: {}
 networks:
   memefeed-network:

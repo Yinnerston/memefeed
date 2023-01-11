@@ -96,6 +96,15 @@ TEMPLATES = [
     },
 ]
 
+# Caches
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://redis_cache:6379",
+    }
+}
+
+
 WSGI_APPLICATION = "memefeed.wsgi.application"
 
 # Django Debug Toolbar: Set INTERNAL_IPS in docker
