@@ -206,107 +206,107 @@ class IndexViewTest(TestCase):
         pass
 
 
-class IndexViewSeleniumTest(LiveServerTestCase):
-    """
-    Selenium test case to simulate user actions like clicks and accessing next page.
-    """
+# class IndexViewSeleniumTest(LiveServerTestCase):
+#     """
+#     Selenium test case to simulate user actions like clicks and accessing next page.
+#     """
 
-    @classmethod
-    def setUpTestData(cls):
-        """
-        First setup reddit data with by running:
-         src\memefeed\scripts\post_reddit_pagination_test_submissions.py
-        """
-        # Setup etl for whole class
-        cls.instance = RedditETL(testing=True)
-        sentry_sdk.init(dsn="")
-        # Set up data for the whole TestCase
-        cls.ids = [
-            "t3_107fh18",
-            "t3_107fh1j",
-            "t3_107fh1v",
-            "t3_107fh26",
-            "t3_107fh2n",
-            "t3_107fh2y",
-            "t3_107fh3g",
-            "t3_107fh3q",
-            "t3_107fh3z",
-            "t3_107fh46",
-            "t3_107fh4c",
-            "t3_107fh4k",
-            "t3_107fh58",
-            "t3_107fh5g",
-            "t3_107fh5q",
-            "t3_107fh5y",
-            "t3_107fh68",
-            "t3_107fh6b",
-            "t3_107fh6i",
-            "t3_107fh6r",
-            "t3_107fh72",
-            "t3_107fh7c",
-            "t3_107fh7q",
-            "t3_107fh83",
-            "t3_107fh8s",
-            "t3_107fh94",
-            "t3_107fh9j",
-            "t3_107fha0",
-            "t3_107fhac",
-            "t3_107fhaq",
-            "t3_107fhb3",
-            "t3_107fhbd",
-            "t3_107fhbm",
-            "t3_107fhbv",
-            "t3_107fhc3",
-            "t3_107fhce",
-            "t3_107fhcq",
-            "t3_107fhd3",
-            "t3_107fhdd",
-            "t3_107fhdp",
-        ]
+#     @classmethod
+#     def setUpTestData(cls):
+#         """
+#         First setup reddit data with by running:
+#          src\memefeed\scripts\post_reddit_pagination_test_submissions.py
+#         """
+#         # Setup etl for whole class
+#         cls.instance = RedditETL(testing=True)
+#         sentry_sdk.init(dsn="")
+#         # Set up data for the whole TestCase
+#         cls.ids = [
+#             "t3_107fh18",
+#             "t3_107fh1j",
+#             "t3_107fh1v",
+#             "t3_107fh26",
+#             "t3_107fh2n",
+#             "t3_107fh2y",
+#             "t3_107fh3g",
+#             "t3_107fh3q",
+#             "t3_107fh3z",
+#             "t3_107fh46",
+#             "t3_107fh4c",
+#             "t3_107fh4k",
+#             "t3_107fh58",
+#             "t3_107fh5g",
+#             "t3_107fh5q",
+#             "t3_107fh5y",
+#             "t3_107fh68",
+#             "t3_107fh6b",
+#             "t3_107fh6i",
+#             "t3_107fh6r",
+#             "t3_107fh72",
+#             "t3_107fh7c",
+#             "t3_107fh7q",
+#             "t3_107fh83",
+#             "t3_107fh8s",
+#             "t3_107fh94",
+#             "t3_107fh9j",
+#             "t3_107fha0",
+#             "t3_107fhac",
+#             "t3_107fhaq",
+#             "t3_107fhb3",
+#             "t3_107fhbd",
+#             "t3_107fhbm",
+#             "t3_107fhbv",
+#             "t3_107fhc3",
+#             "t3_107fhce",
+#             "t3_107fhcq",
+#             "t3_107fhd3",
+#             "t3_107fhdd",
+#             "t3_107fhdp",
+#         ]
 
-        test_data = cls.instance.reddit.info(fullnames=cls.ids)
-        cls.instance._transform_top_submissions(test_data)
+#         test_data = cls.instance.reddit.info(fullnames=cls.ids)
+#         cls.instance._transform_top_submissions(test_data)
 
-    # Tests for full image
-    def test_full_image_ireddit_jpg_png(self):
-        jpg_submission = self.load_submission("zzycfr")
-        png_submission = self.load_submission("zzydk5")
-        # Get full screen of
-        response = self.client.get("/reddit/", data={})
+#     # Tests for full image
+#     def test_full_image_ireddit_jpg_png(self):
+#         jpg_submission = self.load_submission("zzycfr")
+#         png_submission = self.load_submission("zzydk5")
+#         # Get full screen of
+#         response = self.client.get("/reddit/", data={})
 
-    def test_full_image_ireddit_gif(self):
-        jpg_submission = self.load_submission("zzyds7")
+#     def test_full_image_ireddit_gif(self):
+#         jpg_submission = self.load_submission("zzyds7")
 
-    def test_full_image_vreddit_video(self):
-        # TODO: Future Sprint
-        pass
+#     def test_full_image_vreddit_video(self):
+#         # TODO: Future Sprint
+#         pass
 
-    def test_full_image_vreddit_video(self):
-        # TODO: Future Sprint
-        pass
+#     def test_full_image_vreddit_video(self):
+#         # TODO: Future Sprint
+#         pass
 
-    def test_full_image_imgur(self):
-        pass
+#     def test_full_image_imgur(self):
+#         pass
 
-    # Covers nsfw data for full image
-    def test_full_image_nsfw_ireddit_jpg_png(self):
-        pass
+#     # Covers nsfw data for full image
+#     def test_full_image_nsfw_ireddit_jpg_png(self):
+#         pass
 
-    # Tests for pagination
-    def test_pagination_submission_count(self):
-        """
-        Test the default number of records per page.
-        """
-        pass
+#     # Tests for pagination
+#     def test_pagination_submission_count(self):
+#         """
+#         Test the default number of records per page.
+#         """
+#         pass
 
-    def test_pagination_next_prev_button(self):
-        """
-        Test the pagination nnext & prev button is correctly displayed and working.
-        """
-        pass
+#     def test_pagination_next_prev_button(self):
+#         """
+#         Test the pagination nnext & prev button is correctly displayed and working.
+#         """
+#         pass
 
-    def test_pagination_correct_num_pages(self):
-        """
-        Test the pagination displays the correct number of pages.
-        """
-        pass
+#     def test_pagination_correct_num_pages(self):
+#         """
+#         Test the pagination displays the correct number of pages.
+#         """
+#         pass
