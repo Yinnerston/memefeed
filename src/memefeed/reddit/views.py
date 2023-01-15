@@ -8,6 +8,7 @@ from django.db.models import Q
 from .forms import SearchForm
 from .models import Submission, Subreddit
 
+from hashlib import md5
 from datetime import date, datetime, timedelta
 
 ITEMS_LEN = 20
@@ -35,12 +36,11 @@ class IndexView(generic.ListView):
             hour=23, minute=59, second=59
         ).astimezone() - timedelta(weeks=1)
         top_submissions = (
-            Submission.objects.filter(
-                Q(domain__icontains="imgur.com") | Q(domain="i.redd.it")
-            )
-            .filter(created_utc__gte=prev_week)
+            Submission.objects.filter(created_utc__gte=prev_week)
+            .filter(Q(domain__icontains="imgur.com") | Q(domain="i.redd.it"))
             .order_by("-score", "title")
         )
+
         return [
             top_submissions[i : i + ITEMS_LEN]
             for i in range(0, len(top_submissions), ITEMS_LEN)
@@ -63,6 +63,7 @@ class SearchResultsView(generic.ListView):
     View that displays the results of a search.
     """
 
+    MAX_PAGE_DIGITS = 4
     template_name = "reddit/results.html"
     context_object_name = "results_list"
     model = Submission
@@ -75,6 +76,20 @@ class SearchResultsView(generic.ListView):
         """
         context = super(SearchResultsView, self).get_context_data(**kwargs)
         context["q"] = self.request.GET.get("q")
+        context["sort_by"] = self.request.GET.get("sort_by")
+        # Saved context variable "results_cache_key" is results_cache_key + page number
+        # Assume the number of pages will not reach MAX_PAGE_DIGITS digits
+        results_cache_key = self.request.GET.get("results_cache_key")
+        if results_cache_key:
+            context["results_cache_key"] = results_cache_key[
+                : self.MAX_PAGE_DIGITS * -1
+            ] + self.request.GET.get("page").zfill(self.MAX_PAGE_DIGITS)
+        else:
+            # Split on argument params minus csrf_token
+            url_params = self.request.get_full_path().split("&", 1)[1].encode("utf-8")
+            context["results_cache_key"] = md5(url_params).hexdigest()[:6] + "1".zfill(
+                self.MAX_PAGE_DIGITS
+            )
         return context
 
     def parse_subreddits_current_path(self):
@@ -93,11 +108,14 @@ class SearchResultsView(generic.ListView):
         filtered_subreddits = self.parse_subreddits_current_path()
         title = self.request.GET.get("q")
         sort_by = self.request.GET.get("sort_by")
-        order = SearchForm.get_order(int(sort_by))
+        if sort_by:
+            order = SearchForm.get_order(int(sort_by))
+        else:
+            order = SearchForm.get_order(0)
         query = Submission.objects.filter(
             Q(domain="i.redd.it") | Q(domain="v.redd.it") | Q(domain="i.imgur.com")
         )
-        if query:
+        if title:
             # Get specific title
             query = query.filter(title__icontains=title)
         author = self.request.GET.get("author")
@@ -113,7 +131,7 @@ class SearchResultsView(generic.ListView):
         ]
 
 
-class SubredditView(IndexView):
+class SubredditView(generic.ListView):
     """
     Best posts all time on a subreddit.
     Same as search but just filter by subreddit

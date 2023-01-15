@@ -9,7 +9,7 @@ services:
   memefeed:
     build: ./src/memefeed
     # sh -c 'while !</dev/tcp/db/5432; do sleep 1; done;
-    command: python manage.py runserver 0.0.0.0:8000
+    command: bash -c "service cron start; python manage.py runserver 0.0.0.0:8000"
     volumes:
       - ./src/memefeed:/app
     ports:
@@ -101,10 +101,33 @@ services:
     command: -config.file=/etc/promtail/config.yml
     networks:
       - memefeed-network
-
+  redis_cache:
+    image: redis:4-alpine
+    restart: always
+    volumes:
+      # - ./redis.conf:/usr/local/etc/redis/redis.conf # use default config
+      - "redis:/data"
+    ports:
+      - 6379:6379
+    command: redis-server
+    networks:
+      - memefeed-network
+  redis-exporter:
+    image: oliver006/redis_exporter
+    ports:
+      - 9121:9121
+    environment:
+      REDIS_ADDR: redis_cache:6379
+      # REDIS_USER: ${REDIS_USERNAME}
+      # REDIS_PASSWORD: ${REDIS_PASSWORD}
+    links:
+      - redis_cache
+      - prometheus
+    networks:
+      - memefeed-network
 
 volumes:
   postgres_data:
-
+  redis: {}
 networks:
   memefeed-network:

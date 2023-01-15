@@ -1,0 +1,1 @@
+* 1 * * * cd /app && python manage.py shell < scripts/run_etl.py  >> /app/memefeed/log/reddit_etl.log

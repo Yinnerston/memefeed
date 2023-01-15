@@ -55,6 +55,10 @@ class Submission(ExportModelOperationsMixin("submission"), models.Model):
     subreddit = models.ForeignKey(Subreddit, models.CASCADE)
     author = models.ForeignKey(Author, models.CASCADE)
 
+    class Meta:
+        ordering = ["-score"]
+        get_latest_by = "created_utc"
+
 
 # TODO: Future sprint: Implement image server
 class SubmissionFullImage(models.Model):

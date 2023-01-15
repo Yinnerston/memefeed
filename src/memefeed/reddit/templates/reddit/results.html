@@ -2,6 +2,8 @@
 
 {% load reddit_filter %}
 {% load static %}
+{% load cache %}
+
 <link rel="stylesheet" href="{% static 'reddit/assets/css/results.css' %}" />
 
 
@@ -12,34 +14,56 @@
     <h2>Results for {{ q }}</h2>
 {% endblock %}
 
-
+{% comment %}
+Search results are cached per page
+{% endcomment %}
 {% block content %}
-	{% if page_obj %}
-		{% for submissions_list in page_obj %}
-			<div class="items">
-				{% for submission in submissions_list %}
-					{% comment %}
-					See src\memefeed\reddit\templatetags\reddit_filter.py for implementation
-					{% endcomment %}
-					<article class="item thumb span-1">
-						<h2>
-							<strong>{{submission.title}}</strong><br>
-							<a href="{% url 'reddit:subreddit_view' submission.subreddit %}">r/{{submission.subreddit}}</a><br>
-							u/{{submission.author}}
-						</h2>
-						{{ submission | display_media | safe }}
-					</article>
+	{% cache 86400 search_result_cache results_cache_key %}
+		{% if page_obj %}
+			{% for submissions_list in page_obj %}
+				<div class="items">
+					{% for submission in submissions_list %}
+						{% comment %}
+						See src\memefeed\reddit\templatetags\reddit_filter.py for implementation
+						{% endcomment %}
+						<article class="item thumb span-1">
+							<h2>
+								<strong>{{submission.title}}</strong><br>
+								<a href="{% url 'reddit:subreddit_view' submission.subreddit %}">r/{{submission.subreddit}}</a><br>
+								{{ submission.score }}⬆️ by u/{{submission.author}}
+							</h2>
+							{{ submission | display_media | safe }}
+						</article>
 
 
-				{% endfor %}
-			</div>
-		{% endfor %}
-	{% else %}
-		<p>No submissions found.</p>
-	{% endif %}
+					{% endfor %}
+				</div>
+			{% endfor %}
+		{% else %}
+			<p>No submissions found.</p>
+		{% endif %}
+	{% endcache %}
 {% endblock %}
 
 {% block footer %}
+	<div class="pagination">
+		<span class="step-links">
+			{% if page_obj.has_previous %}
+				<a href="?page=1&sort_by={{ sort_by }}&results_cache_key={{ results_cache_key }}">&laquo; first</a>
+				<a href="?page={{ page_obj.previous_page_number }}&sort_by={{ sort_by }}&results_cache_key={{ results_cache_key }}">previous</a>
+			{% endif %}
+
+			<span class="current">
+				Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+			</span>
+
+			{% if page_obj.has_next %}
+				<a href="?page={{ page_obj.next_page_number }}&sort_by={{ sort_by }}&results_cache_key={{ results_cache_key }}">next</a>
+				<a href="?page={{ page_obj.paginator.num_pages }}&sort_by={{ sort_by }}&results_cache_key={{ results_cache_key }}">last &raquo;</a>
+			{% endif %}
+		</span>
+	</div>
+
 	<a href="{% url 'reddit:search_results' %}">
 		<h2 class="FooterIndexLink">See All</h2>
 	</a>
