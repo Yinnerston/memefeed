@@ -12,10 +12,11 @@ repos:
     hooks:
       - id: memefeed-collectstatic
         name: memefeed-collectstatic
-        entry: bash memefeed-collectstatic.sh
+        entry: docker-compose -f docker-compose.prod.yml exec memefeed python manage.py collectstatic --no-input --clear
         language: system
         types: [python]
         pass_filenames: false
+        files: ^static/
 
 
         
