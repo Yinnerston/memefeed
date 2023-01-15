@@ -7,7 +7,7 @@ class SearchForm(forms.Form):
     # Enumerated choices in the form of (sort_value, human_readable_value)
     sort_choices = [(0, "relevance"), (1, "score"), (2, "new"), (3, "A-Z")]
     # TODO: Implement relevance
-    sort_choices_order_by = ["-score", "-score", "created_utc", "title"]
+    sort_choices_order_by = ["-score", "-score", "-created_utc", "title"]
     subreddit_choices = [
         (subreddit, subreddit) for subreddit in Subreddit.objects.all()
     ]
