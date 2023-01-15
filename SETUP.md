@@ -12,6 +12,7 @@ ALTER ROLE memefeeduser SET default_transaction_isolation TO 'read committed';
 ALTER ROLE memefeeduser SET timezone TO 'Australia/Sydney';
 GRANT ALL PRIVILEGES ON DATABASE memefeed TO memefeeduser;
 ```
+- Do the same for Database memefeed_prod with user memefeeduser_prod
 Add the password to the .env file in root directory, `POSTGRES_PASSWORD=PUT_YOU_PASSWORD_HERE`. I would recommend generating a password with
 ```
 openssl rand -hex 32

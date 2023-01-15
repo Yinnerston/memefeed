@@ -9,16 +9,18 @@ services:
   memefeed:
     build: ./src/memefeed
     # sh -c 'while !</dev/tcp/db/5432; do sleep 1; done;
-    command: bash -c "service cron start; gunicorn --env DJANGO_SETTINGS_MODULE=memefeed.settings memefeed.wsgi"
+    command: bash -c "service cron start; gunicorn --env DJANGO_SETTINGS_MODULE=memefeed.settings memefeed.wsgi:application"
     volumes:
       - ./src/memefeed:/app
     ports:
       - 8000:8000
     environment:
       - DEBUG=0
-      - DATABASE_URL=postgresql://memefeeduser:${POSTGRES_PASSWORD}@db:5432/memefeed
-      - DJANGO_DEV_SECRET_KEY=${DJANGO_DEV_SECRET_KEY}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DATABASE_URL=postgresql://memefeeduser_prod:${PROD_POSTGRES_PASSWORD}@db:5432/memefeed
+      - DJANGO_DEV_SECRET_KEY=${PROD_DJANGO_DEV_SECRET_KEY}
+      - POSTGRES_DBNAME=memefeed_prod
+      - POSTGRES_USERNAME=memefeeduser_prod
+      - POSTGRES_PASSWORD=${PROD_POSTGRES_PASSWORD}
       - DJ_LOGLEVEL=INFO # Change in production
     logging: *loki-logging
     depends_on:
@@ -36,7 +38,7 @@ services:
   grafana:
     build: ./src/grafana
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+      - GF_SECURITY_ADMIN_PASSWORD=${PROD_GF_SECURITY_ADMIN_PASSWORD}
     volumes:
       - ./src/grafana:/grafana
       - ./data/grafana:/var/lib/grafana
@@ -54,9 +56,9 @@ services:
     expose:
       - 5432
     environment:
-      - POSTGRES_USER=memefeeduser
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=memefeed
+      - POSTGRES_USER=memefeeduser_prod
+      - POSTGRES_PASSWORD=${PROD_POSTGRES_PASSWORD}
+      - POSTGRES_DB=memefeed_prod
     networks:
       - memefeed-network
   node-exporter:
@@ -118,13 +120,20 @@ services:
       - 9121:9121
     environment:
       REDIS_ADDR: redis_cache:6379
-      # REDIS_USER: ${REDIS_USERNAME}
-      # REDIS_PASSWORD: ${REDIS_PASSWORD}
+      # REDIS_USER: ${PROD_REDIS_USERNAME}
+      # REDIS_PASSWORD: ${PROD_REDIS_PASSWORD}
     links:
       - redis_cache
       - prometheus
     networks:
       - memefeed-network
+  # nginx:
+  #   build: ./nginx
+  #   ports:
+  #     - 1337:80
+  #   depends_on:
+  #     - memefeed
+
 
 volumes:
   postgres_data:

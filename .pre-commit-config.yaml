@@ -8,3 +8,14 @@ repos:
         # pre-commit's default_language_version, see
         # https://pre-commit.com/#top_level-default_language_version
         language_version: python3.10
+  - repo: local
+    hooks:
+      - id: collectstatic
+        name: memefeed-collectstatic
+        entry: docker-compose -f docker-compose.prod.yml exec memefeed python manage.py collectstatic --no-input --clear
+        language: system
+        types: [python]
+        pass_filenames: false
+
+
+        

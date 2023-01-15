@@ -131,8 +131,8 @@ if DEBUG:
 DATABASES = {
     "default": {
         "ENGINE": "django_prometheus.db.backends.postgresql",
-        "NAME": "memefeed",
-        "USER": "memefeeduser",
+        "NAME": os.environ.get("POSTGRES_DBNAME") if not None else "memefeed",
+        "USER": os.environ.get("POSTGRES_USERNAME") if not None else "memefeeduser",
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         "HOST": "db",  # TODO: Migration to high availability server / cloud
         "PORT": "5432",
@@ -175,6 +175,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
