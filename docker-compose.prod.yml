@@ -12,8 +12,9 @@ services:
     command: bash -c "service cron start; gunicorn --env DJANGO_SETTINGS_MODULE=memefeed.settings memefeed.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - ./src/memefeed:/app
-    ports:
-      - 8000:8000
+      - static_volume:/app/static
+    expose:
+      - 8000
     environment:
       - DEBUG=0
       - DATABASE_URL=postgresql://memefeeduser_prod:${PROD_POSTGRES_PASSWORD}@db:5432/memefeed
@@ -127,16 +128,21 @@ services:
       - prometheus
     networks:
       - memefeed-network
-  # nginx:
-  #   build: ./nginx
-  #   ports:
-  #     - 1337:80
-  #   depends_on:
-  #     - memefeed
-
+  nginx:
+    build: ./nginx
+    ports:
+      - 1337:80
+    depends_on:
+      - memefeed
+    volumes:
+      - static_volume:/app/static
+    networks:
+      - memefeed-network
 
 volumes:
   postgres_data:
   redis: {}
+  static_volume:
 networks:
   memefeed-network:
+  

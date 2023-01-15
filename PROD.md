@@ -1,7 +1,12 @@
 # Production Implementation:
 
 - Build from docker-compose.prod.yml
+- Comment out the line ```python
+    path("reddit/", include("reddit.urls")),
+```
+in `src\memefeed\memefeed\urls.py` + save the file.
 - Run `docker-compose -f docker-compose.prod.yml exec memefeed python manage.py migrate --noinput`
+- Uncomment the line
 
 - TODO: Migrate to cloud
 - Lower traced_sample_rate in `sentry_sdk.init` https://docs.sentry.io/platforms/python/guides/django/performance/
