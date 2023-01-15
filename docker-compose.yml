@@ -53,6 +53,7 @@ services:
     image: postgres:13.9-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+      - ./src/db:/db
     expose:
       - 5432
     environment:

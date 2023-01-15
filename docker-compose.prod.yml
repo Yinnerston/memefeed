@@ -9,7 +9,7 @@ services:
   memefeed:
     build: ./src/memefeed
     # sh -c 'while !</dev/tcp/db/5432; do sleep 1; done;
-    command: bash -c "service cron start; gunicorn --env DJANGO_SETTINGS_MODULE=memefeed.settings memefeed.wsgi:application"
+    command: bash -c "service cron start; gunicorn --env DJANGO_SETTINGS_MODULE=memefeed.settings memefeed.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - ./src/memefeed:/app
     ports:
