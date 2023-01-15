@@ -56,3 +56,6 @@ user_agent=Python-Slim:memefeed-script:v1.1.0 (by u/YOUR_USERNAME)
     - Save and Test
 - Import the dashboards (*.json files) from the `data/grafana` directory
 - (Unused) Define REDIS_USERNAME and REDIS_PASSWORD in .env file
+
+# Production:
+- See [#PROD.md](PROD.md) for deployment information
