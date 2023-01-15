@@ -12,7 +12,7 @@ repos:
     hooks:
       - id: collectstatic
         name: memefeed-collectstatic
-        entry: sh collectstatic.sh
+        entry: collectstatic.sh
         language: script
         types: [python]
         pass_filenames: false
