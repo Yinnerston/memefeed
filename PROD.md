@@ -1,6 +1,7 @@
 # Production Implementation:
 
 - Build from docker-compose.prod.yml
+- Run `docker-compose -f docker-compose.prod.yml exec memefeed python manage.py migrate --noinput`
 
 - TODO: Migrate to cloud
 - Lower traced_sample_rate in `sentry_sdk.init` https://docs.sentry.io/platforms/python/guides/django/performance/

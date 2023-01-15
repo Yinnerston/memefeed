@@ -18,7 +18,12 @@ class DomainException(Exception):
 
 # Getattr wrapper functions for author, subreddit foreign key in Submission
 def author_getattr(submission: praw.models.Submission, field_to_get: str) -> str:
-    return getattr(submission, field_to_get).name
+    output = "[DELETED]"
+    try:
+        output = getattr(submission, field_to_get).name
+    except Exception:
+        pass
+    return output
 
 
 def subreddit_getattr(submission: praw.models.Submission, field_to_get: str) -> str:
