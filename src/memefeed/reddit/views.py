@@ -86,10 +86,18 @@ class SearchResultsView(generic.ListView):
             ] + self.request.GET.get("page").zfill(self.MAX_PAGE_DIGITS)
         else:
             # Split on argument params minus csrf_token
-            url_params = self.request.get_full_path().split("&", 1)[1].encode("utf-8")
-            context["results_cache_key"] = md5(url_params).hexdigest()[:6] + "1".zfill(
-                self.MAX_PAGE_DIGITS
-            )
+            try:
+                url_params = (
+                    self.request.get_full_path().split("&", 1)[1].encode("utf-8")
+                )
+                context["results_cache_key"] = md5(url_params).hexdigest()[
+                    :6
+                ] + "1".zfill(self.MAX_PAGE_DIGITS)
+            except IndexError:
+                # Invalid URL without GET params defaults to search on all records
+                context["q"] = ""
+                context["sort_by"] = "0"
+                context["results_cache_key"] = "tempCK"
         return context
 
     def parse_subreddits_current_path(self):
@@ -142,6 +150,10 @@ class SubredditView(generic.ListView):
     paginate_by = 3
 
     def setup(self, request, *args, **kwargs):
+        """
+        Setup for rendering view by getting related subreddit object
+        and setting self.subreddit_not_found based on the object.
+        """
         super().setup(request, *args, **kwargs)
         _subreddit_name = kwargs.get("subreddit_name", None)
         try:
