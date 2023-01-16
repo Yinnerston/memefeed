@@ -7,6 +7,8 @@
 in `src\memefeed\memefeed\urls.py` + save the file.
 - Run `docker-compose -f docker-compose.prod.yml exec memefeed python manage.py migrate --noinput`
 - Uncomment the line
+- Can populate the Submissions with the command `docker-compose -f docker-compose.prod.yml exec memefeed bash` --> Execute `python manage.py shell < scripts/fast_populate_reddit_etl.py` in bash shell
+- If you've opened the site, use `python manage.py clear_cache` in the bash shell
 
 - TODO: Migrate to cloud
 - Lower traced_sample_rate in `sentry_sdk.init` https://docs.sentry.io/platforms/python/guides/django/performance/
