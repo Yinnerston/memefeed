@@ -26,17 +26,17 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         """
         Returns the top submissions by score in descending order.
-        Top submissions are per week.
+        Top submissions from the last couple of days.
         The relevant 'day' for the recent top posts changes every day to make caching easier.
         Submissions are grouped into sub-lists of length = ITEMS_LEN
         """
         # Variable for how many submissions are displayed in a row in the index
         # TODO: Future sprint, implement video, galleries
-        prev_week = datetime.today().replace(
+        index_submission_min_date = datetime.today().replace(
             hour=23, minute=59, second=59
-        ).astimezone() - timedelta(weeks=1)
+        ).astimezone() - timedelta(days=2)
         top_submissions = (
-            Submission.objects.filter(created_utc__gte=prev_week)
+            Submission.objects.filter(created_utc__gte=index_submission_min_date)
             .filter(Q(domain__icontains="imgur.com") | Q(domain="i.redd.it"))
             .order_by("-score", "title")
         )
