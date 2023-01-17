@@ -161,7 +161,7 @@
 		color: #fff;
 		color: rgba(255, 255, 255, 0.85);
 		text-decoration: none;
-		@include vendor('transition', 'color 0.25s ease-in-out');
+		@include vendor('transition', 'color 0.1s ease-in-out');
 
 		&:hover {
 			color: #d64760;
@@ -199,7 +199,7 @@
 				a {
 					opacity: 0.35;
 					color: #fff;
-					@include vendor('transition', 'opacity 0.25s ease-in-out');
+					@include vendor('transition', 'opacity 0.1s ease-in-out');
 
 					&:hover {
 						opacity: 1.0;
@@ -253,7 +253,7 @@
 		@include vendor('flex-direction', 'column');
 		@include vendor('justify-content', 'space-between');
 		@include vendor('align-items', 'center');
-		@include vendor('transition', 'filter 0.5s ease-in-out');
+		@include vendor('transition', 'filter 0.1s ease-in-out');
 
 		&:before {
 			content: '';
@@ -300,7 +300,7 @@
 		$border: 10px;
 
 		@include vendor('transition', 'opacity 1s ease-in-out');
-		@include vendor('transition-delay', '0.5s');
+		@include vendor('transition-delay', '0.1s');
 		position: relative;
 		z-index: 1;
 		width: -moz-min-content;
@@ -390,15 +390,13 @@
 					height: 100%;
 					@include vendor('object-fit', 'cover');
 					@include vendor('object-position', 'center');
-					@include vendor('transition', 'opacity 0.75s ease-in-out');
-					@include vendor('transition-delay', '1.25s');
+					@include vendor('transition', 'opacity 0.1s ease-in-out');
+					@include vendor('transition-delay', '0.1s');
 				}
 
-				@for $i from 1 through 6 {
-					&.delay-#{$i} {
-						img {
-							@include vendor('transition-delay', '#{1.25 + ($i * 0.125)}s');
-						}
+				&.delay-1 {
+					img {
+						@include vendor('transition-delay', '#{0.1}s');
 					}
 				}
 			}
@@ -625,7 +623,7 @@
 			text-decoration: none;
 			font-weight: normal;
 			font-style: normal;
-			@include vendor('transition', 'opacity 0.25s ease-in-out');
+			@include vendor('transition', 'opacity 0.1s ease-in-out');
 			opacity: 0.35;
 
 			&:hover {
