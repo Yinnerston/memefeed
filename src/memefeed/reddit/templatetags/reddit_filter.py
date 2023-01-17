@@ -21,7 +21,7 @@ def display_media(submission, autoescape=True):
             # Image (jpg, png, gif) from reddit or imgur
             tmp_url = esc(submission.url)
             article = f'<a href="{tmp_url}" class="image">\
-            <img src="{tmp_url}" alt="" id="{submission.id}">\
+            <img src="{tmp_url}" alt="" id="{submission.id}" loading="lazy">\
             </a>'
         elif submission.domain == "v.redd.it":
             # Video
