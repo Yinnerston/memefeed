@@ -12,6 +12,7 @@ ALTER ROLE memefeeduser SET default_transaction_isolation TO 'read committed';
 ALTER ROLE memefeeduser SET timezone TO 'Australia/Sydney';
 GRANT ALL PRIVILEGES ON DATABASE memefeed TO memefeeduser;
 ```
+- Do the same for Database memefeed_prod with user memefeeduser_prod
 Add the password to the .env file in root directory, `POSTGRES_PASSWORD=PUT_YOU_PASSWORD_HERE`. I would recommend generating a password with
 ```
 openssl rand -hex 32
@@ -56,3 +57,6 @@ user_agent=Python-Slim:memefeed-script:v1.1.0 (by u/YOUR_USERNAME)
     - Save and Test
 - Import the dashboards (*.json files) from the `data/grafana` directory
 - (Unused) Define REDIS_USERNAME and REDIS_PASSWORD in .env file
+
+# Production:
+- See [#PROD.md](PROD.md) for deployment information

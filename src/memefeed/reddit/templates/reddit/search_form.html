@@ -1,6 +1,19 @@
 {% include "reddit/header.html" %}
+{% load static %}
 
-<form action="{% url 'reddit:search_results' %}" method="get">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Search">
-</form>
+
+<div class="searchformnav">
+    <link rel="stylesheet" href="{% static 'reddit/assets/css/search_form.css' %}">
+    <h1>
+        Compose your search:
+    </h1>
+    <h3>
+        Leave form fields empty to search on the entire dataset.
+    </h3>
+    <form action="{% url 'reddit:search_results' %}" method="get">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">
+            <img src="{% static 'reddit/images/search_form_submit.png' %}" alt="Submit Button">
+        </button>
+    </form>
+</div>

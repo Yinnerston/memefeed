@@ -164,10 +164,10 @@ input, select, textarea {
 		color: #fff;
 		color: rgba(255, 255, 255, 0.85);
 		text-decoration: none;
-		-moz-transition: color 0.25s ease-in-out;
-		-webkit-transition: color 0.25s ease-in-out;
-		-ms-transition: color 0.25s ease-in-out;
-		transition: color 0.25s ease-in-out;
+		-moz-transition: color 0.1s ease-in-out;
+		-webkit-transition: color 0.1s ease-in-out;
+		-ms-transition: color 0.1s ease-in-out;
+		transition: color 0.1s ease-in-out;
 	}
 
 		a:hover {
@@ -206,10 +206,10 @@ input, select, textarea {
 			ul.icons li a {
 				opacity: 0.35;
 				color: #fff;
-				-moz-transition: opacity 0.25s ease-in-out;
-				-webkit-transition: opacity 0.25s ease-in-out;
-				-ms-transition: opacity 0.25s ease-in-out;
-				transition: opacity 0.25s ease-in-out;
+				-moz-transition: opacity 0.1s ease-in-out;
+				-webkit-transition: opacity 0.1s ease-in-out;
+				-ms-transition: opacity 0.1s ease-in-out;
+				transition: opacity 0.1s ease-in-out;
 			}
 
 				ul.icons li a:hover {
@@ -285,10 +285,10 @@ input, select, textarea {
 		-webkit-align-items: center;
 		-ms-align-items: center;
 		align-items: center;
-		-moz-transition: -moz-filter 0.5s ease-in-out;
-		-webkit-transition: -webkit-filter 0.5s ease-in-out;
-		-ms-transition: -ms-filter 0.5s ease-in-out;
-		transition: filter 0.5s ease-in-out;
+		-moz-transition: -moz-filter 0.1s ease-in-out;
+		-webkit-transition: -webkit-filter 0.1s ease-in-out;
+		-ms-transition: -ms-filter 0.1s ease-in-out;
+		transition: filter 0.1s ease-in-out;
 	}
 
 		#wrapper:before {
@@ -347,10 +347,10 @@ input, select, textarea {
 		-webkit-transition: opacity 1s ease-in-out;
 		-ms-transition: opacity 1s ease-in-out;
 		transition: opacity 1s ease-in-out;
-		-moz-transition-delay: 0.5s;
-		-webkit-transition-delay: 0.5s;
-		-ms-transition-delay: 0.5s;
-		transition-delay: 0.5s;
+		-moz-transition-delay: 0.1s;
+		-webkit-transition-delay: 0.1s;
+		-ms-transition-delay: 0.1s;
+		transition-delay: 0.1s;
 		position: relative;
 		z-index: 1;
 		width: -moz-min-content;
@@ -465,58 +465,22 @@ input, select, textarea {
 					-webkit-object-position: center;
 					-ms-object-position: center;
 					object-position: center;
-					-moz-transition: opacity 0.75s ease-in-out;
-					-webkit-transition: opacity 0.75s ease-in-out;
-					-ms-transition: opacity 0.75s ease-in-out;
-					transition: opacity 0.75s ease-in-out;
-					-moz-transition-delay: 1.25s;
-					-webkit-transition-delay: 1.25s;
-					-ms-transition-delay: 1.25s;
-					transition-delay: 1.25s;
+					-moz-transition: opacity 0.1s ease-in-out;
+					-webkit-transition: opacity 0.1s ease-in-out;
+					-ms-transition: opacity 0.1s ease-in-out;
+					transition: opacity 0.1s ease-in-out;
+					-moz-transition-delay: 0.1s;
+					-webkit-transition-delay: 0.1s;
+					-ms-transition-delay: 0.1s;
+					transition-delay: 0.1s;
 				}
 
 				#main .item.thumb.delay-1 img {
-					-moz-transition-delay: 1.375s;
-					-webkit-transition-delay: 1.375s;
-					-ms-transition-delay: 1.375s;
-					transition-delay: 1.375s;
+					-moz-transition-delay: 0.1s;
+					-webkit-transition-delay: 0.1s;
+					-ms-transition-delay: 0.1s;
+					transition-delay: 0.1s;
 				}
-
-				#main .item.thumb.delay-2 img {
-					-moz-transition-delay: 1.5s;
-					-webkit-transition-delay: 1.5s;
-					-ms-transition-delay: 1.5s;
-					transition-delay: 1.5s;
-				}
-
-				#main .item.thumb.delay-3 img {
-					-moz-transition-delay: 1.625s;
-					-webkit-transition-delay: 1.625s;
-					-ms-transition-delay: 1.625s;
-					transition-delay: 1.625s;
-				}
-
-				#main .item.thumb.delay-4 img {
-					-moz-transition-delay: 1.75s;
-					-webkit-transition-delay: 1.75s;
-					-ms-transition-delay: 1.75s;
-					transition-delay: 1.75s;
-				}
-
-				#main .item.thumb.delay-5 img {
-					-moz-transition-delay: 1.875s;
-					-webkit-transition-delay: 1.875s;
-					-ms-transition-delay: 1.875s;
-					transition-delay: 1.875s;
-				}
-
-				#main .item.thumb.delay-6 img {
-					-moz-transition-delay: 2s;
-					-webkit-transition-delay: 2s;
-					-ms-transition-delay: 2s;
-					transition-delay: 2s;
-				}
-
 		body.is-preload #main {
 			opacity: 0;
 		}
@@ -754,10 +718,10 @@ input, select, textarea {
 			text-decoration: none;
 			font-weight: normal;
 			font-style: normal;
-			-moz-transition: opacity 0.25s ease-in-out;
-			-webkit-transition: opacity 0.25s ease-in-out;
-			-ms-transition: opacity 0.25s ease-in-out;
-			transition: opacity 0.25s ease-in-out;
+			-moz-transition: opacity 0.1s ease-in-out;
+			-webkit-transition: opacity 0.1s ease-in-out;
+			-ms-transition: opacity 0.1s ease-in-out;
+			transition: opacity 0.1s ease-in-out;
 			opacity: 0.35;
 		}
 

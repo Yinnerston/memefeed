@@ -18,6 +18,8 @@ services:
       - DEBUG=1
       - DATABASE_URL=postgresql://memefeeduser:${POSTGRES_PASSWORD}@db:5432/memefeed
       - DJANGO_DEV_SECRET_KEY=${DJANGO_DEV_SECRET_KEY}
+      - POSTGRES_DBNAME=memefeed
+      - POSTGRES_USERNAME=memefeeduser
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - DJ_LOGLEVEL=DEBUG # Change in production
     logging: *loki-logging
@@ -51,6 +53,7 @@ services:
     image: postgres:13.9-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+      - ./src/db:/db
     expose:
       - 5432
     environment:

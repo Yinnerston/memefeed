@@ -88,9 +88,9 @@
 
 	// Items.
 
-		// Assign a random "delay" class to each thumbnail item.
+		// Assign a "delay" class to each thumbnail item.
 			$('.item.thumb').each(function() {
-				$(this).addClass('delay-' + Math.floor((Math.random() * 6) + 1));
+				$(this).addClass('delay-1');
 			});
 
 		// IE: Fix thumbnail images.

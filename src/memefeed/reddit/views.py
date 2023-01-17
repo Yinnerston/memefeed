@@ -26,24 +26,24 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         """
         Returns the top submissions by score in descending order.
-        Top submissions are per week.
+        Top submissions from the last couple of days.
         The relevant 'day' for the recent top posts changes every day to make caching easier.
         Submissions are grouped into sub-lists of length = ITEMS_LEN
         """
         # Variable for how many submissions are displayed in a row in the index
         # TODO: Future sprint, implement video, galleries
-        prev_week = datetime.today().replace(
+        index_submission_min_date = datetime.today().replace(
             hour=23, minute=59, second=59
-        ).astimezone() - timedelta(weeks=1)
+        ).astimezone() - timedelta(days=2)
         top_submissions = (
-            Submission.objects.filter(created_utc__gte=prev_week)
+            Submission.objects.filter(created_utc__gte=index_submission_min_date)
             .filter(Q(domain__icontains="imgur.com") | Q(domain="i.redd.it"))
-            .order_by("-score", "title")
+            .order_by("-score")
         )
 
         return [
             top_submissions[i : i + ITEMS_LEN]
-            for i in range(0, len(top_submissions), ITEMS_LEN)
+            for i in range(0, top_submissions.count(), ITEMS_LEN)
         ]
 
 
@@ -86,10 +86,18 @@ class SearchResultsView(generic.ListView):
             ] + self.request.GET.get("page").zfill(self.MAX_PAGE_DIGITS)
         else:
             # Split on argument params minus csrf_token
-            url_params = self.request.get_full_path().split("&", 1)[1].encode("utf-8")
-            context["results_cache_key"] = md5(url_params).hexdigest()[:6] + "1".zfill(
-                self.MAX_PAGE_DIGITS
-            )
+            try:
+                url_params = (
+                    self.request.get_full_path().split("&", 1)[1].encode("utf-8")
+                )
+                context["results_cache_key"] = md5(url_params).hexdigest()[
+                    :6
+                ] + "1".zfill(self.MAX_PAGE_DIGITS)
+            except IndexError:
+                # Invalid URL without GET params defaults to search on all records
+                context["q"] = ""
+                context["sort_by"] = "0"
+                context["results_cache_key"] = "tempCK"
         return context
 
     def parse_subreddits_current_path(self):
@@ -142,6 +150,10 @@ class SubredditView(generic.ListView):
     paginate_by = 3
 
     def setup(self, request, *args, **kwargs):
+        """
+        Setup for rendering view by getting related subreddit object
+        and setting self.subreddit_not_found based on the object.
+        """
         super().setup(request, *args, **kwargs)
         _subreddit_name = kwargs.get("subreddit_name", None)
         try:
