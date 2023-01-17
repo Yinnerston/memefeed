@@ -38,12 +38,12 @@ class IndexView(generic.ListView):
         top_submissions = (
             Submission.objects.filter(created_utc__gte=index_submission_min_date)
             .filter(Q(domain__icontains="imgur.com") | Q(domain="i.redd.it"))
-            .order_by("-score", "title")
+            .order_by("-score")
         )
 
         return [
             top_submissions[i : i + ITEMS_LEN]
-            for i in range(0, len(top_submissions), ITEMS_LEN)
+            for i in range(0, top_submissions.count(), ITEMS_LEN)
         ]
 
 
