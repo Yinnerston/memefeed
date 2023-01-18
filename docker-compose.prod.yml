@@ -23,6 +23,7 @@ services:
       - POSTGRES_USERNAME=memefeeduser_prod
       - POSTGRES_PASSWORD=${PROD_POSTGRES_PASSWORD}
       - DJ_LOGLEVEL=INFO # Change in production
+      - PROD_IP=${PROD_IP}
     logging: *loki-logging
     depends_on:
       - db
