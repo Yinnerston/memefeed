@@ -69,7 +69,7 @@ class IndexViewTest(TestCase):
         """
         jpg_submission = self.load_submission("zzycfr")
         # Check that jpg is loaded correctly
-        response = self.client.get("/reddit/", data={})
+        response = self.client.get("/", data={})
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotEqual(response.context["top_submissions_list"], [])
         index_jpg_submission = response.context["top_submissions_list"][0][0]
@@ -87,7 +87,7 @@ class IndexViewTest(TestCase):
         """
         png_submission = self.load_submission("zzydk5")
         # Check that jpg is loaded correctly
-        response = self.client.get("/reddit/", data={})
+        response = self.client.get("/", data={})
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotEqual(response.context["top_submissions_list"], [])
         index_png_submission = response.context["top_submissions_list"][0][0]
@@ -106,7 +106,7 @@ class IndexViewTest(TestCase):
         gif_submission = self.load_submission("zzyds7")
         self.assertNotEquals(Submission.objects.count(), 0)
         # Check that jpg is loaded correctly
-        response = self.client.get("/reddit/", data={})
+        response = self.client.get("/", data={})
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotEqual(response.context["top_submissions_list"], [])
         index_gif_submission = response.context["top_submissions_list"][0][0]
@@ -136,7 +136,7 @@ class IndexViewTest(TestCase):
         imgur_submission = self.load_submission("100f2k6")
         self.assertEqual(Submission.objects.count(), 1)
         # Check that jpg is loaded correctly
-        response = self.client.get("/reddit/", data={})
+        response = self.client.get("/", data={})
         self.assertEquals(response.status_code, HTTPStatus.OK)
 
         self.assertNotContains(response, "No submissions found")
@@ -157,7 +157,7 @@ class IndexViewTest(TestCase):
         imgur_submission = self.load_submission("1016e0z")
         self.assertEqual(Submission.objects.count(), 1)
         # Check that video is loaded correctly
-        response = self.client.get("/reddit/", data={})
+        response = self.client.get("/", data={})
         self.assertEquals(response.status_code, HTTPStatus.OK)
 
         self.assertNotContains(response, "No submissions found")
@@ -186,7 +186,7 @@ class IndexViewTest(TestCase):
         """
         nsfw_submission = self.load_submission("zzye6e")
         # Check that jpg is loaded correctly
-        response = self.client.get("/reddit/", data={})
+        response = self.client.get("/", data={})
         self.assertEquals(response.status_code, HTTPStatus.OK)
         index_nsfw_submission = response.context["top_submissions_list"][0][0]
         self.assertEquals(nsfw_submission, index_nsfw_submission)
@@ -272,7 +272,7 @@ class IndexViewTest(TestCase):
 #         jpg_submission = self.load_submission("zzycfr")
 #         png_submission = self.load_submission("zzydk5")
 #         # Get full screen of
-#         response = self.client.get("/reddit/", data={})
+#         response = self.client.get("/", data={})
 
 #     def test_full_image_ireddit_gif(self):
 #         jpg_submission = self.load_submission("zzyds7")
