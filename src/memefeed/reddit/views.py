@@ -26,7 +26,7 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         """
         Returns the top submissions by score in descending order.
-        Top submissions from the last couple of days.
+        Top submissions from the last couple of days. Hides NSFW submissions.
         The relevant 'day' for the recent top posts changes every day to make caching easier.
         Submissions are grouped into sub-lists of length = ITEMS_LEN
         """
