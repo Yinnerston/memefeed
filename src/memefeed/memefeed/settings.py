@@ -103,13 +103,20 @@ TEMPLATES = [
     },
 ]
 
-# Caches
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://redis_cache:6379",
+# Cache with redis in prod, use dummy cache in dev
+if not DEBUG:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": "redis://redis_cache:6379",
+        }
     }
-}
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        }
+    }
 
 
 WSGI_APPLICATION = "memefeed.wsgi.application"
