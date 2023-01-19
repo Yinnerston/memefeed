@@ -53,7 +53,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env("DJANGO_DEV_SECRET_KEY")
 
 
-ALLOWED_HOSTS = ["localhost", "memefeed", ".memefeed.xyz"]
+ALLOWED_HOSTS = ["localhost", "memefeed", ".memefeed.xyz", os.getenv("PROD_IP")]
 
 
 # Application definition
@@ -103,13 +103,20 @@ TEMPLATES = [
     },
 ]
 
-# Caches
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://redis_cache:6379",
+# Cache with redis in prod, use dummy cache in dev
+if not DEBUG:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": "redis://redis_cache:6379",
+        }
     }
-}
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        }
+    }
 
 
 WSGI_APPLICATION = "memefeed.wsgi.application"

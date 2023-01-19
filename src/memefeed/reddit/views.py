@@ -9,7 +9,7 @@ from .forms import SearchForm
 from .models import Submission, Subreddit
 
 from hashlib import md5
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 ITEMS_LEN = 20
 

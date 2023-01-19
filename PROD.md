@@ -20,5 +20,6 @@ PROD_DJANGO_SUPERUSER_PASSWORD=???
 PROD_GF_SECURITY_ADMIN_PASSWORD=???
 PROD_REDIS_USERNAME=???
 PROD_REDIS_PASSWORD=???
+PROD_IP=??? # IP of your server
 ```
 - Note that the production containers should not be run on a computer that is already using postgres/13. Otherwise, because a postgres_data volume is used, the volume can overwrite the existing postgres data on your computer. This includes the development containers.

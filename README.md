@@ -7,6 +7,11 @@ I've also never implemented a caching server nor have I delved deeply into postg
 
 I am self-hosting the docker containers. It is deployed at http://memefeed.xyz . I plan on providing support for this project throughout 2023 and gain experience in commiting to a project over an extended period of time (>1 year).
 
+<img src="assets/memefeed-index-view.PNG" alt="drawing" height="300"/>             |  <img src="assets/memefeed-grafana-redis-cache.PNG" alt="drawing" width="500"/>
+:-------------------------:|:-------------------------:
+<img src="assets/memefeed-grafana-django-prometheus.PNG" alt="drawing" width="500"/>  |  <img src="assets/memefeed-grafana-docker-host.PNG" alt="drawing" width="500"/>
+
+
 # Agile Proposal, Notes & System Architecture
 
 https://drive.google.com/drive/folders/10FNr-SX2xRIu2HvutmdhYNkCW2Mc2M3k?usp=sharing
