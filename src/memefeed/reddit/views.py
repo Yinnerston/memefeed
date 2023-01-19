@@ -38,6 +38,7 @@ class IndexView(generic.ListView):
         top_submissions = (
             Submission.objects.filter(created_utc__gte=index_submission_min_date)
             .filter(Q(domain__icontains="imgur.com") | Q(domain="i.redd.it"))
+            .filter(nsfw=False)
             .order_by("-score")
         )
 
@@ -116,6 +117,7 @@ class SearchResultsView(generic.ListView):
         filtered_subreddits = self.parse_subreddits_current_path()
         title = self.request.GET.get("q")
         sort_by = self.request.GET.get("sort_by")
+        nsfw_allowed = self.request.GET.get("nsfw_allowed")
         if sort_by:
             order = SearchForm.get_order(int(sort_by))
         else:
@@ -123,15 +125,18 @@ class SearchResultsView(generic.ListView):
         query = Submission.objects.filter(
             Q(domain="i.redd.it") | Q(domain="v.redd.it") | Q(domain="i.imgur.com")
         )
-        if title:
-            # Get specific title
-            query = query.filter(title__icontains=title)
         author = self.request.GET.get("author")
         if author:
             # TODO: IS this validation good enought?
             query = query.filter(author=author)
         if filtered_subreddits:
             query = query.filter(subreddit__in=filtered_subreddits)
+
+        if title:
+            # Get specific title
+            query = query.filter(title__icontains=title)
+        if not nsfw_allowed:
+            query = query.filter(nsfw=False)
         result_submissions = query.order_by(order).all()
         return [
             result_submissions[i : i + ITEMS_LEN]

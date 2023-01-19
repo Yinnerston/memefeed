@@ -23,6 +23,7 @@ class SearchForm(forms.Form):
     )
     author = forms.CharField(label="u/author", max_length=20, required=False)
     sort_by = forms.ChoiceField(choices=sort_choices, initial="relevance")
+    nsfw_allowed = forms.BooleanField(label="Allow NSFW", required=False)
 
     @staticmethod
     def get_order(sort_value: int):
