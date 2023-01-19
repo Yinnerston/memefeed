@@ -120,16 +120,16 @@ class IndexViewTest(TestCase):
         # Check that that the png has been rendered
         self.assertContains(response, gif_submission.title)
 
-    def test_thumbnail_ireddit_selftext(self):
-        pass
+    # def test_thumbnail_ireddit_selftext(self):
+    #     pass
 
-    # TODO: Different video formats (?)
-    def test_thumbnail_vreddit_video(self):
-        pass
+    # # TODO: Different video formats (?)
+    # def test_thumbnail_vreddit_video(self):
+    #     pass
 
-    def test_thumbnail_reddit_gallery(self):
-        # TODO: Write test for full image after implementation
-        pass
+    # def test_thumbnail_reddit_gallery(self):
+    #     # TODO: Write test for full image after implementation
+    #     pass
 
     def test_thumbnail_imgur(self):
         """
@@ -173,14 +173,6 @@ class IndexViewTest(TestCase):
         # Check that that the video has been rendered
         self.assertContains(response, imgur_submission.title)
 
-    def test_thumbnail_misc(self):
-        # TODO: Write test for full image after implementation
-        pass
-
-    def test_thumbnail_crosspost(self):
-        # TODO: Future Sprint
-        pass
-
     # Covers nsfw data for thumbnails
     def test_thumbnail_nsfw_ireddit_jpg_png(self):
         """
@@ -199,13 +191,27 @@ class IndexViewTest(TestCase):
         # Check that that the png has been rendered
         self.assertContains(response, nsfw_submission.title)
 
-    def test_thumbnail_span_ratio_jpg_png(self):
-        # TODO: Future Sprint
+    def test_index_no_nsfw_submissions(self):
+        """
+        Test no NSFW posts are shown on the index page.
+        """
         pass
 
-    def test_thumbnail_span_ratio_video(self):
-        # TODO: Future Sprint
-        pass
+    # def test_thumbnail_misc(self):
+    #     # TODO: Write test for full image after implementation
+    #     pass
+
+    # def test_thumbnail_crosspost(self):
+    #     # TODO: Future Sprint
+    #     pass
+
+    # def test_thumbnail_span_ratio_jpg_png(self):
+    #     # TODO: Future Sprint
+    #     pass
+
+    # def test_thumbnail_span_ratio_video(self):
+    #     # TODO: Future Sprint
+    #     pass
 
 
 # class IndexViewSeleniumTest(LiveServerTestCase):
