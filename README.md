@@ -42,7 +42,7 @@ A more comprehensive summary will be updated on https://docs.google.com/document
 - General front-end dev.
 
 # Setup:
-- Follow instructions in [setup.md](SETUP.md)
+- Follow instructions in [SETUP.md](SETUP.md)
 - `docker-compose build`
 - `docker-compose up -d`
 
