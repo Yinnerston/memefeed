@@ -45,7 +45,7 @@ class SearchFormTest(TestCase):
         # Title corresponding to submission id=zvms2j
         exact_title = "Test JPG"
         response = self.client.get(
-            "/reddit/search/results", data={"q": exact_title, "sort_by": 0}
+            "search/results", data={"q": exact_title, "sort_by": 0}
         )
         self.assertEquals(response.status_code, HTTPStatus.OK)
         self.assertNotContains(response, "No submissions found")
@@ -55,7 +55,7 @@ class SearchFormTest(TestCase):
         Test empty query string returns all results.
         """
         response = self.client.get(
-            "/reddit/search/results",
+            "search/results",
             data={
                 "q": "",
                 "sort_by": 0,
@@ -72,7 +72,7 @@ class SearchFormTest(TestCase):
         Test search for a title that is not in the database returns no results
         """
         response = self.client.get(
-            "/reddit/search/results",
+            "search/results",
             data={
                 "q": "hgdafghdfgasdgesfsadfsfdsdfvxcvxdfwsfzsdfcxdsdf",
                 "sort_by": 0,
@@ -90,7 +90,7 @@ class SearchFormTest(TestCase):
         """
         # Title corresponding to submission id=zvms2j
         response = self.client.get(
-            "/reddit/search/results",
+            "search/results",
             data={"q": "", "sort_by": 0, "subreddit": "test_memefeed"},
         )
         self.assertEquals(response.status_code, HTTPStatus.OK)
@@ -106,7 +106,7 @@ class SearchFormTest(TestCase):
         TODO:
         """
         response = self.client.get(
-            "/reddit/search/results?q=&subreddit=test_memefeed&subreddit=u_YinnerstonTest&sort_by=0",
+            "search/results?q=&subreddit=test_memefeed&subreddit=u_YinnerstonTest&sort_by=0",
             # data={"q": "", "sort_by": 0, "subreddit": "test_memefeed"},
         )
         self.assertEquals(response.status_code, HTTPStatus.OK)
@@ -123,7 +123,7 @@ class SearchFormTest(TestCase):
         Test search for a subreddit that is not in the database returns no results
         """
         response = self.client.get(
-            "/reddit/search/results",
+            "search/results",
             data={"q": "", "sort_by": 0, "subreddit": "invalid_name"},
         )
         self.assertEquals(response.status_code, HTTPStatus.OK)
@@ -138,7 +138,7 @@ class SearchFormTest(TestCase):
         """
         # Title corresponding to submission id=zvms2j
         response = self.client.get(
-            "/reddit/search/results",
+            "search/results",
             data={"q": "", "sort_by": 0, "author": "YinnerstonTest"},
         )
         self.assertEquals(response.status_code, HTTPStatus.OK)
@@ -154,7 +154,7 @@ class SearchFormTest(TestCase):
         Test search for a title that is not in the database returns no results
         """
         response = self.client.get(
-            "/reddit/search/results",
+            "search/results",
             data={"q": "", "sort_by": 0, "author": "SomeInvalidAuthor"},
         )
         self.assertEquals(response.status_code, HTTPStatus.OK)
@@ -173,7 +173,7 @@ class SearchFormTest(TestCase):
         Sort the responses by score.
         """
         response = self.client.get(
-            "/reddit/search/results",
+            "search/results",
             data={
                 "q": "",
                 "sort_by": 1,
@@ -195,7 +195,7 @@ class SearchFormTest(TestCase):
         Test sort submissions in response by new
         """
         response = self.client.get(
-            "/reddit/search/results",
+            "search/results",
             data={
                 "q": "",
                 "sort_by": 2,
@@ -217,7 +217,7 @@ class SearchFormTest(TestCase):
         Test submissions sorted by title
         """
         response = self.client.get(
-            "/reddit/search/results",
+            "search/results",
             data={
                 "q": "",
                 "sort_by": 3,

@@ -2,7 +2,7 @@
 
 - Build from docker-compose.prod.yml
 - Comment out the line ```python
-    path("reddit/", include("reddit.urls")),
+    path("", include("reddit.urls")),
 ```
 in `src\memefeed\memefeed\urls.py` + save the file.
 - Run `docker-compose -f docker-compose.prod.yml exec memefeed python manage.py migrate --noinput`
