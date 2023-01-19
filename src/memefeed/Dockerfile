@@ -23,7 +23,11 @@ RUN apt-get update && apt-get install -y \
 
 RUN python -m pip install -r requirements.txt --no-cache-dir
 
+# Set timezone for cron
+RUN cp /etc/timezone /etc/localtime.orig
+RUN cp /usr/share/zoneinfo/Australia/Sydney /etc/localtime
 # schedule etl using cron
 RUN chmod 755 ./entry.sh
 RUN /usr/bin/crontab etl
 RUN cp etl /etc/cron.d/etl
+
