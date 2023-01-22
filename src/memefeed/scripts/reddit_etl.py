@@ -188,6 +188,10 @@ class RedditETL:
                             obj = Submission.objects.create(**output_model)
                             if obj:
                                 created_submission = True
+                        else:
+                            # Object is already in database. Update fields
+                            obj.score = output_model["score"]
+                            obj.save()
 
         except DatabaseError as e:
             # Expected behaviour for a invalid post is to report , ignore it and add subsequent posts

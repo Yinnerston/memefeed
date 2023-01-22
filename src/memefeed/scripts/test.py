@@ -262,3 +262,20 @@ class RedditETLTest(TestCase):
         self.assertEquals(Author.objects.count(), 2)
         self.assertEquals(Subreddit.objects.count(), 1)
         self.assertEquals(Submission.objects.count(), 3)
+
+    def test_update_score(self):
+        """
+        Load a submission, change the score of the submission and attempt to load it again.
+        Test that the score has been changed in the Submission.
+        """
+        submission = self.instance.reddit.submission("zvn17h")
+        output_submission = self.instance._load_submission(submission)
+        # Check that score matches
+        self.assertEquals(submission.score, output_submission.score)
+        # Reload with changed score
+        submission.score = 99999
+        second_output_submission = self.instance._load_submission(submission)
+        self.assertEquals(submission.score, second_output_submission.score)
+        # Get id of submission
+        final_output = Submission.objects.get(id=submission.id)
+        self.assertEquals(final_output.score, submission.score)
