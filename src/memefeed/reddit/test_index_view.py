@@ -174,28 +174,44 @@ class IndexViewTest(TestCase):
         self.assertContains(response, imgur_submission.title)
 
     # Covers nsfw data for thumbnails
-    def test_thumbnail_nsfw_ireddit_jpg_png(self):
+    def test_nsfw_ireddit_jpg_png_hidden(self):
         """
-        Test thumbnail correctly takes image data from nsfw reddit post.
+        Test index hides nsfw posts from ireddit with the .jpg or .png file extension.
         """
         nsfw_submission = self.load_submission("zzye6e")
         # Check that jpg is loaded correctly
         response = self.client.get("/", data={})
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        index_nsfw_submission = response.context["top_submissions_list"][0][0]
-        self.assertEquals(nsfw_submission, index_nsfw_submission)
-        # Check that the url can be opened
-        self.assertEquals(
-            urllib.request.urlopen(index_nsfw_submission.url).getcode(), HTTPStatus.OK
-        )
-        # Check that that the png has been rendered
-        self.assertContains(response, nsfw_submission.title)
+        self.assertContains(response, "No submissions found")
+        self.assertEquals(len(response.context["top_submissions_list"]), 0)
+        # index_nsfw_submission = response.context["top_submissions_list"][0][0]
+        # self.assertEquals(nsfw_submission, index_nsfw_submission)
+        # # Check that the url can be opened
+        # self.assertEquals(
+        #     urllib.request.urlopen(index_nsfw_submission.url).getcode(), HTTPStatus.OK
+        # )
+        # # Check that that the png has been rendered
+        # self.assertContains(response, nsfw_submission.title)
 
-    def test_index_no_nsfw_submissions(self):
+    def test_index_posts_within_time_range_days(self):
         """
-        Test no NSFW posts are shown on the index page.
+        Check that all posts are within around 2 DAYS
         """
-        pass
+        # Check post 2 days ago is invalid
+        hidden_submission = self.load_submission("zzydk5")
+        hidden_submission.created_utc = IndexViewTest.curTime - timedelta(days=2)
+        hidden_submission.save()
+        # Check post 1 day ago is valid
+        shown_submission = self.load_submission("100f2k6")
+        shown_submission.created_utc = IndexViewTest.curTime - timedelta(days=1)
+        shown_submission.save()
+        # Get index page
+        response = self.client.get("/", data={})
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertNotEqual(response.context["top_submissions_list"], [])
+        self.assertEquals(len(response.context["top_submissions_list"][0]), 1)
+        valid_shown_submission = response.context["top_submissions_list"][0][0]
+        self.assertEquals(valid_shown_submission.id, shown_submission.id)
 
     # def test_thumbnail_misc(self):
     #     # TODO: Write test for full image after implementation

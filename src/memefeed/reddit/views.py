@@ -23,18 +23,20 @@ class IndexView(generic.ListView):
     context_object_name = "top_submissions_list"
     paginate_by = 3
 
+    N_DAYS_SHOWN = 1.5
+
     def get_queryset(self):
         """
         Returns the top submissions by score in descending order.
-        Top submissions from the last couple of days. Hides NSFW submissions.
+        Top submissions from the last N_DAYS_SHOWN of days. Hides NSFW submissions.
         The relevant 'day' for the recent top posts changes every day to make caching easier.
         Submissions are grouped into sub-lists of length = ITEMS_LEN
         """
         # Variable for how many submissions are displayed in a row in the index
         # TODO: Future sprint, implement video, galleries
-        index_submission_min_date = datetime.today().replace(
-            hour=23, minute=59, second=59
-        ).astimezone() - timedelta(days=2)
+        index_submission_min_date = datetime.today().astimezone() - timedelta(
+            days=IndexView.N_DAYS_SHOWN
+        )
         top_submissions = (
             Submission.objects.filter(created_utc__gte=index_submission_min_date)
             .filter(Q(domain__icontains="imgur.com") | Q(domain="i.redd.it"))
