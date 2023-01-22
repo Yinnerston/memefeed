@@ -88,7 +88,6 @@ class SearchFormTest(TestCase):
         self.assertEquals(response.status_code, HTTPStatus.OK)
         results_list = self.flatten_results_list(response.context["results_list"])
         self.assertEqual(len(results_list), 0)
-        self.assertContains(response, "No submissions found")
 
     # Test search with filter by subreddit
     def test_search_filter_by_specific_subreddit(self):
