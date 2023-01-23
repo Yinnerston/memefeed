@@ -60,3 +60,15 @@ user_agent=Python-Slim:memefeed-script:v1.1.0 (by u/YOUR_USERNAME)
 
 # Production:
 - See [#PROD.md](PROD.md) for deployment information
+
+# ETL:
+- For all the environment variables defined in the memefeed container, define them at the top of the etl script. E.G:
+```bash
+DEBUG=???
+DATABASE_URL=???
+POSTGRES_DBNAME=???
+POSTGRES_USERNAME=???
+POSTGRES_PASSWORD=???
+DJ_LOGLEVEL=???
+DJANGO_DEV_SECRET_KEY=???
+```

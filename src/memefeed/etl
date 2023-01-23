@@ -1,2 +1,3 @@
-PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-0 */6 * * * cd /app && python manage.py shell < scripts/run_etl.py  >> /app/log/reddit_etl.log
+HOME=/app
+PATH=/usr/local/lib:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+* */6 * * * python manage.py run_etl  >> /app/log/reddit_etl.log
