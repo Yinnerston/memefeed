@@ -72,3 +72,4 @@ POSTGRES_PASSWORD=???
 DJ_LOGLEVEL=???
 DJANGO_DEV_SECRET_KEY=???
 ```
+- Run `git update-index --skip-worktree etl` to get git to stop tracking changes to the etl script
