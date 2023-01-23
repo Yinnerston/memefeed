@@ -17,6 +17,8 @@ class SearchFormTest(TestCase):
     And corresponding FormView SearchResultsView
     """
 
+    N_NSFW_IN_TEST_DATA = 1
+
     @classmethod
     def setUpTestData(cls):
         # Setup etl for whole class
@@ -30,12 +32,17 @@ class SearchFormTest(TestCase):
             "t3_104wtz7",  # png on u_YinnerstonTest
             "t3_104wtfy",  # jpg on u_YinnerstonTest
             "t3_10770f4",  # jpg on u_YinnerstonMemefeed
+            "t3_10ftxus",  # nsfw png on u_YinnerstonMemefeed
         ]
+
         test_data = cls.instance.reddit.info(fullnames=cls.ids)
         cls.instance._transform_top_submissions(test_data)
 
     def flatten_results_list(self, results_list):
         return sum(results_list, [])
+
+    def len_non_nsfw(self, results_list):
+        return len(results_list) - self.N_NSFW_IN_TEST_DATA
 
     # Tests for Title
     def test_search_exact_title_match(self):
@@ -65,7 +72,7 @@ class SearchFormTest(TestCase):
         self.assertNotContains(response, "No submissions found")
         # Check all submissions are present
         results_list = self.flatten_results_list(response.context["results_list"])
-        self.assertEqual(len(results_list), len(self.ids))
+        self.assertEqual(len(results_list), self.len_non_nsfw(self.ids))
 
     def test_search_by_invalid_title(self):
         """
@@ -79,7 +86,6 @@ class SearchFormTest(TestCase):
             },
         )
         self.assertEquals(response.status_code, HTTPStatus.OK)
-        self.assertContains(response, "No submissions found")
         results_list = self.flatten_results_list(response.context["results_list"])
         self.assertEqual(len(results_list), 0)
 
@@ -183,7 +189,7 @@ class SearchFormTest(TestCase):
         self.assertNotContains(response, "No submissions found")
         # Check that submissions are descending by score
         results_list = self.flatten_results_list(response.context["results_list"])
-        self.assertEqual(len(results_list), len(self.ids))
+        self.assertEqual(len(results_list), self.len_non_nsfw(self.ids))
         prev_score = None
         for result in results_list:
             if prev_score is not None:
@@ -205,7 +211,7 @@ class SearchFormTest(TestCase):
         self.assertNotContains(response, "No submissions found")
         # Check that submissions are descending by created_utc
         results_list = self.flatten_results_list(response.context["results_list"])
-        self.assertEqual(len(results_list), len(self.ids))
+        self.assertEqual(len(results_list), self.len_non_nsfw(self.ids))
         prev_time = None
         for result in results_list:
             if prev_time is not None:
@@ -227,9 +233,30 @@ class SearchFormTest(TestCase):
         self.assertNotContains(response, "No submissions found")
         # Check that submissions are descending by score
         results_list = self.flatten_results_list(response.context["results_list"])
-        self.assertEqual(len(results_list), len(self.ids))
+        self.assertEqual(len(results_list), self.len_non_nsfw(self.ids))
         prev_title = None
         for result in results_list:
             if prev_title is not None:
                 self.assertLess(result.title, prev_title)
                 prev_title = result.title
+
+    def test_allow_nsfw(self):
+        response = self.client.get(
+            "/search/results",
+            data={"q": "", "sort_by": 0},
+        )
+        response_with_nsfw = self.client.get(
+            "/search/results",
+            data={"q": "", "sort_by": 0, "nsfw_allowed": "on"},
+        )
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertNotContains(response, "No submissions found")
+        self.assertEquals(response_with_nsfw.status_code, HTTPStatus.OK)
+        self.assertNotContains(response_with_nsfw, "No submissions found")
+
+        # Check that submissions are descending by score
+        results_list = self.flatten_results_list(response.context["results_list"])
+        results_list_with_nsfw = self.flatten_results_list(
+            response_with_nsfw.context["results_list"]
+        )
+        self.assertEquals(len(results_list) + 1, len(results_list_with_nsfw))

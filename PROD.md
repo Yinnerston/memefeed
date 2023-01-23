@@ -4,7 +4,7 @@
 - Comment out the line `path("reddit/", include("reddit.urls")),` in `src\memefeed\memefeed\urls.py` + save the file. Otherwise the migration in the next line will not work
 - Run `docker-compose -f docker-compose.prod.yml exec memefeed python manage.py migrate --noinput`
 - Uncomment the line `path("reddit/", include("reddit.urls")),`. 
-- Can populate the Submissions with the command `docker-compose -f docker-compose.prod.yml exec memefeed bash` --> Execute `python manage.py shell < scripts/fast_populate_reddit_etl.py` in bash shell
+- Can populate the Submissions with the command `docker-compose -f docker-compose.prod.yml exec memefeed bash` --> Execute `python manage.py shell < scripts/fast_populate_reddit_etl.py` in bash shell and `python manage.py collectstatic`
 - If you've opened the site, use `python manage.py clear_cache` in the bash shell
 - traced_sample_rate is lowered in `sentry_sdk.init` https://docs.sentry.io/platforms/python/guides/django/performance/
 - Load balancing and cache server
