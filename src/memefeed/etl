@@ -1,3 +1,3 @@
 HOME=/app
 PATH=/usr/local/lib:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-* */6 * * * python manage.py run_etl  >> /app/log/reddit_etl.log
+0 */6 * * * python manage.py run_etl  >> /app/log/reddit_etl.log
