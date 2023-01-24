@@ -1,2 +1,4 @@
 # All static files are collected to the static directory during deployment
 static/*
+cron-env
+run-as-cron
