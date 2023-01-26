@@ -53,7 +53,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env("DJANGO_DEV_SECRET_KEY")
 
 
-ALLOWED_HOSTS = ["localhost", "memefeed", ".memefeed.xyz", os.getenv("PROD_IP")]
+ALLOWED_HOSTS = ["localhost", "memefeed", ".memefeed.xyz", "nathanmemefeedserver",os.getenv("PROD_IP")]
 
 
 # Application definition
