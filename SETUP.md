@@ -57,6 +57,7 @@ user_agent=Python-Slim:memefeed-script:v1.1.0 (by u/YOUR_USERNAME)
     - Save and Test
 - Import the dashboards (*.json files) from the `data/grafana` directory
 - (Unused) Define REDIS_USERNAME and REDIS_PASSWORD in .env file
+- If you get a permission denied error on starting prometheus container, run `sudo chown nobody:nogroup src/prometheus`
 
 # Production:
 - See [#PROD.md](PROD.md) for deployment information
@@ -72,4 +73,3 @@ POSTGRES_PASSWORD=???
 DJ_LOGLEVEL=???
 DJANGO_DEV_SECRET_KEY=???
 ```
-- Run `git update-index --skip-worktree etl` to get git to stop tracking changes to the etl script

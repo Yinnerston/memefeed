@@ -49,6 +49,7 @@ services:
     depends_on:
       - prometheus
     logging: *loki-logging
+    user: '472'
     networks:
       - memefeed-network
   db:
