@@ -5,10 +5,10 @@
 {% block title %}Memefeed By Yinnerston{% endblock %}
 
 {%block page_name %}
-    {% if subreddit_not_found %}
-        <h2>Invalid subreddit name!</h2>
-    {% elif subreddit %}
-        <h2>Posts from r/{{subreddit.name}}</h2>
+    {% if author_not_found %}
+        <h2>Invalid author name!</h2>
+    {% elif author %}
+        <h2>Posts from r/{{author.name}}</h2>
     {% endif %}
 {% endblock %}
 
@@ -23,8 +23,8 @@
 					<article class="item thumb span-1">
 						<h2>
 							<strong>{{submission.title}}</strong><br>
-							<a href="{% url 'reddit:subreddit_view' submission.subreddit %}">r/{{submission.subreddit}}</a><br>
-							{{ submission.score }}⬆️ by <a href="{% url 'reddit:author_view' submission.author %}">u/{{submission.author}}</a>
+							<a href="{% url 'reddit:author_view' submission.author %}">r/{{submission.subreddit}}</a><br>
+							{{ submission.score }}⬆️ by u/{{submission.author}}
 						</h2>
 						{{ submission | display_media | safe }}
 					</article>

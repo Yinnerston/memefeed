@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.db.models import Q
 
 from .forms import SearchForm
-from .models import Submission, Subreddit
+from .models import Submission, Subreddit, Author
 
 from hashlib import md5
 from datetime import datetime, timedelta
@@ -191,6 +191,62 @@ class SubredditView(generic.ListView):
             subreddit_name = self.subreddit
             top_submissions = (
                 Submission.objects.filter(subreddit=subreddit_name)
+                .filter(Q(domain__icontains="imgur.com") | Q(domain="i.redd.it"))
+                .order_by("-score", "title")
+            )
+            return [
+                top_submissions[i : i + ITEMS_LEN]
+                for i in range(0, len(top_submissions), ITEMS_LEN)
+            ]
+        else:
+            return []
+
+
+class AuthorView(generic.ListView):
+    """
+    Best posts all time by an author.
+    Same as search but just filter by author
+    """
+
+    template_name = "reddit/author.html"
+    context_object_name = "top_submissions_list"
+    paginate_by = 3
+
+    def setup(self, request, *args, **kwargs):
+        """
+        Setup for rendering view by getting related author object
+        and setting self.author_not_found based on the object.
+        """
+        super().setup(request, *args, **kwargs)
+        _author_name = kwargs.get("author_name", None)
+        try:
+            self.author = Author.objects.get(name=_author_name)
+            self.author_not_found = False
+        except:
+            self.author = None
+            self.author_not_found = True
+
+    def get_context_data(self, **kwargs):
+        """
+        Extra arguments passed to template
+        """
+        context = super(AuthorView, self).get_context_data(**kwargs)
+        context["author"] = self.author
+        context["author_not_found"] = self.author_not_found
+        return context
+
+    def get_queryset(self):
+        """
+        Returns the top submissions by score in descending order.
+        Submissions are grouped into sub-lists of length = ITEMS_LEN
+        """
+        # Variable for how many submissions are displayed in a row in the index
+        # TODO: Future sprint, implement video, galleries
+        #  | Q(domain="v.redd.it")
+        if not self.author_not_found:
+            author_name = self.author
+            top_submissions = (
+                Submission.objects.filter(author=author_name)
                 .filter(Q(domain__icontains="imgur.com") | Q(domain="i.redd.it"))
                 .order_by("-score", "title")
             )

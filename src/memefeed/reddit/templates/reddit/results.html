@@ -30,7 +30,7 @@ Search results are cached per page
 							<h2>
 								<strong>{{submission.title}}</strong><br>
 								<a href="{% url 'reddit:subreddit_view' submission.subreddit %}">r/{{submission.subreddit}}</a><br>
-								{{ submission.score }}⬆️ by u/{{submission.author}}
+								{{ submission.score }}⬆️ by <a href="{% url 'reddit:author_view' submission.author %}">u/{{submission.author}}</a>
 							</h2>
 							{{ submission | display_media | safe }}
 						</article>
