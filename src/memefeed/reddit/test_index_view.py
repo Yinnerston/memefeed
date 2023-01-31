@@ -11,7 +11,8 @@ from scripts.reddit_etl import RedditETL
 from reddit.models import Author, Subreddit, Submission
 from http import HTTPStatus
 import sentry_sdk
-import urllib
+import urllib.request
+
 from datetime import datetime, timedelta
 from pytz import timezone
 
@@ -212,6 +213,13 @@ class IndexViewTest(TestCase):
         self.assertEquals(len(response.context["top_submissions_list"][0]), 1)
         valid_shown_submission = response.context["top_submissions_list"][0][0]
         self.assertEquals(valid_shown_submission.id, shown_submission.id)
+
+    def test_permalink(self):
+        submission = self.load_submission("zzydk5")
+        response = self.client.get("/", data={})
+        self.assertEquals(response.status_code, HTTPStatus.OK)
+        reddit_link = "https://www.reddit.com/r/test_memefeed/comments/zzydk5/test_png/"
+        self.assertContains(response, reddit_link)
 
     # def test_thumbnail_misc(self):
     #     # TODO: Write test for full image after implementation
