@@ -1,7 +1,6 @@
 from selenium import webdriver
 
 driver = webdriver.Chrome()
-print("Index Page:")
 driver.get("https://memefeed.xyz")
 driver.get("https://memefeed.xyz/?page=2&sort_by=")
 subreddits = [
