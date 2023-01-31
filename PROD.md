@@ -36,3 +36,9 @@ PROD_IP=??? # IP of your server
 # Stopping Production
 - docker-compose -f docker-compose.prod.yml down --remove-orphans
 - If down is not working: run `sudo systemctl daemon-reload` then `sudo systemctl restart docker`
+
+# Selenium Touch Cache:
+- Because the traffic on my site is too low and caches are timing out, use the script `src/memefeed/scripts/touch_memefeed.py` to 
+- Run the python script in a venv with selenium (can use the `src/memefeed/requirements.txt`)
+- Download a Chrome driver that matches your chrome version and add it to PATH https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/
+- Schedule it with cron to run every X minutes
