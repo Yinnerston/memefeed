@@ -54,7 +54,7 @@ SECRET_KEY = env("DJANGO_DEV_SECRET_KEY")
 
 
 ALLOWED_HOSTS = ["localhost", "memefeed", ".memefeed.xyz", "nathanmemefeedserver",os.getenv("PROD_IP")]
-
+CSRF_TRUSTED_ORIGINS=['https://*.memefeed.xyz', 'https://memefeed.xyz', 'https://nathanmemefeedserver'] 
 
 # Application definition
 
