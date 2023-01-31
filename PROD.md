@@ -23,3 +23,16 @@ PROD_REDIS_PASSWORD=???
 PROD_IP=??? # IP of your server
 ```
 - Note that the production containers should not be run on a computer that is already using postgres/13. Otherwise, because a postgres_data volume is used, the volume can overwrite the existing postgres data on your computer. This includes the development containers.
+
+# HTTPS:
+- Replace memefeed.xyz with your server_name in `./data/nginx/nginx.conf` and `init-letsencrypt.sh`
+- run ./init-letsencrypt.sh 
+
+# Running Production:
+- docker-compose -f docker-compose.prod.yml build
+- ./init-letsencrypt.sh 
+- docker-compose -f docker-compose.prod.yml up -d
+
+# Stopping Production
+- docker-compose -f docker-compose.prod.yml down --remove-orphans
+- If down is not working: run `sudo systemctl daemon-reload` then `sudo systemctl restart docker`
