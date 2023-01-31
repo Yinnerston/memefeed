@@ -16,6 +16,16 @@ class DomainException(Exception):
         return super().__str__() + str(self.domain)
 
 
+def domain_is_valid(domain):
+    """
+    Check if the domain parameter is in a list of accepted domains
+    otherwise raise a DomainException
+    """
+    if domain not in ["i.redd.it", "i.imgur.com"]:
+        raise DomainException(domain=domain)
+    return True
+
+
 # Getattr wrapper functions for author, subreddit foreign key in Submission
 def author_getattr(submission: praw.models.Submission, field_to_get: str) -> str:
     output = "[DELETED]"
@@ -82,6 +92,13 @@ def filter_getattr_media_metadata_image_url_list(
 def getattr_allowed_domains(submission: praw.models.Submission, domain: str):
     attr = getattr(submission, domain)
     # These are the currently allowed domains
-    if attr not in ["i.redd.it", "i.imgur.com"]:
-        raise DomainException(domain=attr)
+    domain_is_valid(domain)
+    return attr
+
+
+def getattr_permalink(submission: praw.models.Submission, permalink: str):
+    # TODO: How do I know the url will not run malicious code?
+    # Look into django url validator?
+    # Check if URL is valid
+    attr = "https://www.reddit.com" + getattr(submission, permalink)
     return attr
