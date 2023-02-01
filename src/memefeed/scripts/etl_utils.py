@@ -16,7 +16,7 @@ class DomainException(Exception):
         return super().__str__() + str(self.domain)
 
 
-def domain_is_valid(domain):
+def domain_is_valid(domain: str):
     """
     Check if the domain parameter is in a list of accepted domains
     otherwise raise a DomainException

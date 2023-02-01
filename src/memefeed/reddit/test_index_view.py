@@ -215,6 +215,9 @@ class IndexViewTest(TestCase):
         self.assertEquals(valid_shown_submission.id, shown_submission.id)
 
     def test_permalink(self):
+        """
+        Test permalink is valid reddit link
+        """
         submission = self.load_submission("zzydk5")
         response = self.client.get("/", data={})
         self.assertEquals(response.status_code, HTTPStatus.OK)
