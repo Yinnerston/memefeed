@@ -41,5 +41,6 @@ PROD_IP=??? # IP of your server
 - Because the traffic on my site is too low and caches are timing out, use the script `src/memefeed/scripts/touch_memefeed.py` to 
 - Run the python script in a venv with selenium (can use the `src/memefeed/requirements.txt`)
 - Download a Chrome driver that matches your chrome version and add it to PATH https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/
+- Start `chromedriver`
 - [Linux]: Schedule it with cron to run every X minutes
 - [Windows]: Install pyinstaller `pip install pyinstaller`. Run `pyinstaller --onefile src/memefeed/scripts/touch_memefeed.py`. Add `dist/touch_memefeed.exe` to Task Scheduler to run every X minutes.

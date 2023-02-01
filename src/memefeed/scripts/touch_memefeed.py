@@ -1,3 +1,6 @@
+"""
+Open memefeed.xyz using Chrome through Selenium to refresh/initialize caches
+"""
 from selenium import webdriver
 
 driver = webdriver.Chrome()
