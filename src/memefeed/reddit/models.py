@@ -36,6 +36,7 @@ class Submission(ExportModelOperationsMixin("submission"), models.Model):
     title = models.CharField("Title of a Reddit post", max_length=300)
     score = models.IntegerField("Upvotes")
     url = models.URLField("Submission URL")
+    permalink = models.URLField("Permalink URL", max_length=300)
     domain = models.CharField("Domain", max_length=50)
     created_utc = models.DateTimeField("Date the submission was created")
     # Submission Content / Media

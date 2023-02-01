@@ -9,6 +9,8 @@ from csv import reader
 from re import match
 import sentry_sdk
 
+import urllib.request
+from urllib.error import HTTPError
 import logging
 
 from scripts.etl_utils import *
@@ -82,6 +84,7 @@ class RedditETL:
         "media_only": (getattr, "media_only"),
         "media": (filter_null_getattr_list, "media"),
         "media_embed": (filter_null_getattr_list, "media_embed"),
+        "permalink": (getattr_permalink, "permalink"),
         "selftext": (filter_null_getattr_str, "selftext"),
         "selftext_html": (filter_null_getattr_list_bleach, "selftext_html"),
         "nsfw": (getattr, "over_18"),
@@ -119,6 +122,18 @@ class RedditETL:
             # We recommend adjusting this value in production.
             traces_sample_rate=1.0,
         )
+
+    def _update_submission(self):
+        pass
+        # Check url hasn't changed, otherwise overwrite url
+        # TODO: Check if image is still valid
+        # https://dev.to/bowmanjd/hardening-and-simplifying-python-s-urlopen-4gee
+        # try:
+        #     domain_is_valid(output_model["domain"])
+        #     urllib.request.urlopen(obj.url).getcode()
+        # except HTTPError:
+        #     obj.delete()
+        # Change score
 
     def _load_submission(self, submission: praw.models.Submission):
         """
@@ -189,7 +204,9 @@ class RedditETL:
                             if obj:
                                 created_submission = True
                         else:
-                            # Object is already in database. Update fields
+                            # Object is already in database.
+                            # TODO: Implement self._update_submission()
+                            # Update fields
                             obj.score = output_model["score"]
                             obj.save()
 

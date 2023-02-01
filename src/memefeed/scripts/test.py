@@ -173,12 +173,14 @@ class RedditETLTest(TestCase):
         self.assertTrue(Submission.objects.get(id=submission.id))
         self.assertEquals(Subreddit.objects.count(), 1)
 
-    def test_duplicate_pk_different_attribute_values(self):
+    def test_duplicate_pk_unchanging_attribute_values(self):
         """
+        Test post with duplicate PK with an different unchanging attribute value is idempotent.
         Test no error is produced on insertion of duplicate pk, with changed value(s).
         """
         submission = self.get_example_submission()
-        submission_score = submission.score
+        # Title cannot be updated
+        submission_title = submission.title
         # Load submission into db
         loaded_submission = self.instance._load_submission(submission)
         # Check that only one Author, Subreddit, Submission has been loaded
@@ -188,10 +190,10 @@ class RedditETLTest(TestCase):
         self.assertEquals(Subreddit.objects.count(), 1)
         first_get = Submission.objects.get(id=submission.id)
         self.assertTrue(first_get)
-        self.assertEquals(submission_score, first_get.score)
+        self.assertEquals(submission_title, first_get.title)
         self.assertEquals(Subreddit.objects.count(), 1)
         # Attempt to change a field, then load same submission
-        submission.score = 1234
+        submission.title = "invalid title"
         # Nothing should be changed in the db
         loaded_submission = self.instance._load_submission(submission)
         self.assertTrue(Author.objects.get(name=submission.author))
@@ -200,8 +202,8 @@ class RedditETLTest(TestCase):
         self.assertEquals(Subreddit.objects.count(), 1)
         second_get = Submission.objects.get(id=submission.id)
         self.assertEquals(first_get, second_get)
-        self.assertEquals(submission_score, second_get.score)
-        self.assertEquals(first_get.score, second_get.score)
+        self.assertEquals(submission_title, second_get.title)
+        self.assertEquals(first_get.title, second_get.title)
         self.assertEquals(Subreddit.objects.count(), 1)
 
     def test_load_submission_EOM(self):

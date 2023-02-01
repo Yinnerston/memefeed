@@ -8,7 +8,7 @@
     {% if author_not_found %}
         <h2>Invalid author name!</h2>
     {% elif author %}
-        <h2>Posts from r/{{author.name}}</h2>
+        <h2>Posts from u/{{author.name}}</h2>
     {% endif %}
 {% endblock %}
 
@@ -22,7 +22,7 @@
 					{% endcomment %}
 					<article class="item thumb span-1">
 						<h2>
-							<strong>{{submission.title}}</strong><br>
+							<strong>{{submission.title}}</strong><a href="{{submission.permalink}}"><i class="fa fa-link" aria-hidden="true"></i></a><br>
 							<a href="{% url 'reddit:author_view' submission.author %}">r/{{submission.subreddit}}</a><br>
 							{{ submission.score }}⬆️ by u/{{submission.author}}
 						</h2>
