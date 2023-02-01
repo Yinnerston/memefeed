@@ -2,6 +2,8 @@
 template
 *venv
 
+# 
+build
 # vscode
 .vscode
 
